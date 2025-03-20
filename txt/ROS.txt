@@ -1,0 +1,32 @@
+// WebSocket
+roslaunch rosbridge_server rosbridge_websocket.launch
+roslaunch rosbridge_server rosbridge_websocket.launch ssl:=true certfile:=/home/karimmmsah/ssl/cert.pem keyfile:=/home/karimmmsah/ssl/key.pem
+-------------------------------------------------------------------------------------------------------------------------------------------------
+// Static IP
+sudo nano /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens33:  
+      dhcp4: no
+      addresses:
+        - 192.168.1.50/24  # Set your desired static IP
+      gateway4: 192.168.1.1  # Replace with your router's IP
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4
+sudo netplan apply
+-------------------------------------------------------------------------------------------------------------------------------------------------
+// SSL
+mkdir ~/ssl
+cd ~/ssl
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+(then add cert to windows)
+roslaunch rosbridge_server rosbridge_websocket.launch ssl:=true certfile:=/home/karimmmsah/ssl/cert.pem keyfile:=/home/karimmmsah/ssl/key.pem
+-------------------------------------------------------------------------------------------------------------------------------------------------
+// Firewall
+sudo ufw allow from 192.168.1.X to any port 9090
+sudo ufw statuss
+-------------------------------------------------------------------------------------------------------------------------------------------------

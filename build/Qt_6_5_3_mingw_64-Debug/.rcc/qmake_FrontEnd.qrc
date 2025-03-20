@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/FrontEnd">
+    <file alias="qmldir">C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/FrontEnd/qmldir</file>
+  </qresource>
+</RCC>
+

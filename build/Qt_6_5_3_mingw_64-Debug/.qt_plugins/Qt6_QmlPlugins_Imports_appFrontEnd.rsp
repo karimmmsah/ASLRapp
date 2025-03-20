@@ -1,0 +1,14 @@
+-rootPath
+C:/Users/HP/Documents/Qt/FrontEnd
+-cmake-output
+-output-file
+C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/.qt_plugins/Qt6_QmlPlugins_Imports_appFrontEnd.cmake
+-importPath
+C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/FrontEnd
+-importPath
+C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug
+-importPath
+D:/Software/Qt/6.5.3/mingw_64/./qml
+-qrcFiles
+C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/.rcc/qmake_FrontEnd.qrc
+C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/.rcc/appFrontEnd_raw_qml_0.qrc
