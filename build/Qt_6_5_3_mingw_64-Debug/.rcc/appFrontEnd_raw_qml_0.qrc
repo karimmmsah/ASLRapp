@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/FrontEnd/">
+    <file alias="Main.qml">C:/Users/HP/Documents/Qt/FrontEnd/Main.qml</file>
+    <file alias="resources.qrc">C:/Users/HP/Documents/Qt/FrontEnd/resources.qrc</file>
+  </qresource>
+</RCC>
+

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/AI_Warehouse.jpg</file>
+        <file>Images/ASU.png</file>
+        <file>Images/Icon.png</file>
+    </qresource>
+</RCC>

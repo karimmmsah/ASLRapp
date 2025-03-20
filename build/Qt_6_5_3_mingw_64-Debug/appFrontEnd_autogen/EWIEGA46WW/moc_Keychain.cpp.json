@@ -1,0 +1,44 @@
+{
+    "classes": [
+        {
+            "className": "Keychain",
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "username",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "password",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "storeCredentials",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "retrieveUsername",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "name": "retrievePassword",
+                    "returnType": "QString"
+                }
+            ],
+            "object": true,
+            "qualifiedClassName": "Keychain",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "Keychain.h",
+    "outputRevision": 68
+}
