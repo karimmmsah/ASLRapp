@@ -103,13 +103,13 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 40,
+				"line" : 39,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 1,
-				"line" : 37,
+				"line" : 36,
 				"parent" : 0
 			},
 			{
@@ -983,11 +983,11 @@
 			"id" : "appFrontEnd_qmlimportscan::@6890427a1f51a3e7e1df"
 		},
 		{
-			"backtrace" : 0,
-			"id" : "appFrontEnd_autogen::@6890427a1f51a3e7e1df"
+			"id" : "appFrontEnd_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "appFrontEnd_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
+			"backtrace" : 0,
+			"id" : "appFrontEnd_autogen::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "appFrontEnd::@6890427a1f51a3e7e1df",
