@@ -1,8 +1,0 @@
-<RCC>
-  <qresource prefix="/">
-    <file alias="Resources/Images/AI_Warehouse.jpg">C:/Users/HP/Documents/Qt/FrontEnd/Resources/Images/AI_Warehouse.jpg</file>
-    <file alias="Resources/Images/ASU.png">C:/Users/HP/Documents/Qt/FrontEnd/Resources/Images/ASU.png</file>
-    <file alias="Resources/Images/Icon.png">C:/Users/HP/Documents/Qt/FrontEnd/Resources/Images/Icon.png</file>
-  </qresource>
-</RCC>
-
