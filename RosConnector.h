@@ -13,7 +13,8 @@ public:
     explicit RosConnector(QObject *parent = nullptr);
 
     Q_INVOKABLE void connectToRos();
-    bool isConnected() const { return m_isConnected; }
+    Q_INVOKABLE void sendMessage(const QString &message);
+    bool isConnected() const { return m_isConnected; } 
 
 signals:
     void connectedToRos();

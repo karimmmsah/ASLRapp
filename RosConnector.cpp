@@ -23,3 +23,12 @@ void RosConnector::onDisconnected() {
     emit connectionFailed();
     emit connectionStatusChanged();
 }
+
+void RosConnector::sendMessage(const QString &message) {
+    if (m_isConnected && webSocket.isValid()) {
+        qDebug() << "Sending message to ROS:" << message;
+        webSocket.sendTextMessage(message);
+    } else {
+        qDebug() << "WebSocket not connected. Message not sent.";
+    }
+}

@@ -60,6 +60,17 @@
                         "access": "public",
                         "name": "connectToRos",
                         "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "message",
+                                "type": "QString"
+                            }
+                        ],
+                        "name": "sendMessage",
+                        "returnType": "void"
                     }
                 ],
                 "object": true,

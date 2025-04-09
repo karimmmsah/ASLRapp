@@ -1170,7 +1170,7 @@ Window {
                 focus: true
 
                 onVisibleChanged: {
-                    if (visible) keyHandler.forceActiveFocus();
+                    if (manualControlPage.visible === true) keyHandler.forceActiveFocus();
                 }
 
                 Keys.onPressed: (event) => {
@@ -1178,31 +1178,31 @@ Window {
 
                                     switch (event.key) {
                                         case 16777235: // Numpad 8
-                                        console.log("Move Forward");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         case 16777237: // Numpad 2
-                                        console.log("Move Backward");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         case 16777234: // Numpad 4
-                                        console.log("Move Left");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}');
                                         break;
                                         case 16777236: // Numpad 6
-                                        console.log("Move Right");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}');
                                         break;
                                         case 16777233: // Numpad 7
-                                        console.log("Move North-West");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}');
                                         break;
                                         case 16777239: // Numpad 9
-                                        console.log("Move North-East");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}');
                                         break;
                                         case 16777232: // Numpad 1
-                                        console.log("Move South-West");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}');
                                         break;
                                         case 16777238: // Numpad 3
-                                        console.log("Move South-East");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}');
                                         break;
                                         case 16777227: // Numpad 5
-                                        console.log("STOP");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         default:
                                         console.log("Unknown Key:", event.key);
@@ -1222,7 +1222,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move North-West")
+                        onClicked: console.log("Move North-West") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1231,7 +1231,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Forward")
+                        onClicked: console.log("Move Forward") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1240,7 +1240,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move North-East")
+                        onClicked: console.log("Move North-East") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
                 }
@@ -1253,7 +1253,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Left")
+                        onClicked: console.log("Move Left") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1262,7 +1262,7 @@ Window {
                         width: controlPanel.stopSize
                         height: controlPanel.stopSize
                         font.pointSize: 16
-                        onClicked: console.log("STOP")
+                        onClicked: console.log("STOP") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
                         background: Rectangle { color: "red"; radius: 10 }
                     }
 
@@ -1271,7 +1271,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Right")
+                        onClicked: console.log("Move Right") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
                 }
@@ -1284,7 +1284,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move South-West")
+                        onClicked: console.log("Move South-West") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1293,7 +1293,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Backward")
+                        onClicked: console.log("Move Backward") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1302,7 +1302,7 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move South-East")
+                        onClicked: console.log("Move South-East") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
                 }
