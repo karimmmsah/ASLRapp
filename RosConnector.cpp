@@ -7,7 +7,7 @@ RosConnector::RosConnector(QObject *parent) : QObject(parent) {
 
 void RosConnector::connectToRos() {
     qDebug() << "Attempting to connect to ROS...";
-    webSocket.open(QUrl("ws://192.168.1.50:9090"));  // IP
+    webSocket.open(QUrl("ws://192.168.1.29:9090"));
 }
 
 void RosConnector::onConnected() {
@@ -15,6 +15,10 @@ void RosConnector::onConnected() {
     m_isConnected = true;
     emit connectedToRos();
     emit connectionStatusChanged();
+
+    // Topics
+    sendMessage(R"({"op": "subscribe", "topic": "/hoverboard/connected", "type": "std_msgs/Bool"})");
+    sendMessage(R"({"op": "subscribe", "topic": "/hoverboard/battery_voltage", "type": "std_msgs/Float64"})");
 }
 
 void RosConnector::onDisconnected() {

@@ -11,11 +11,13 @@ Window {
     visibility: Window.FullScreen
     title: qsTr("ASLR Control Panel")
     color: "#f8f9fA"
+
     // Connect Page
     Item {
         id: connectPage
         anchors.fill: parent
         visible: true
+
         // Background Image
         Image {
             id: background
@@ -97,6 +99,7 @@ Window {
                 anchors.topMargin: 760
                 z: -22
             }
+
             // Connect Button
             Button {
                 id: connectButton
@@ -138,6 +141,7 @@ Window {
                     }
                 }
             }
+
             // Exit Button
             Button {
                 id: exitButton
@@ -170,6 +174,7 @@ Window {
 
                 onClicked: exitDialog.open()
             }
+
             // Exit Confirmation Dialog
             Dialog {
                 id: exitDialog
@@ -244,6 +249,7 @@ Window {
         id: loginPage
         anchors.fill: parent
         visible: false
+
         // Title
         Text {
             x: 239
@@ -299,10 +305,12 @@ Window {
             anchors.topMargin: 760
             z: -22
         }
+
         // Credentials
         Column {
             anchors.centerIn: parent
             spacing: 20
+
             // Username Field
             Rectangle {
                 width: 280
@@ -329,6 +337,7 @@ Window {
                     }
                 }
             }
+
             // Password Field
             Rectangle {
                 width: 280
@@ -360,6 +369,7 @@ Window {
                     }
                 }
             }
+
             // Login Button
             Button {
                 id: loginButton
@@ -392,6 +402,7 @@ Window {
                 }
             }
         }
+
         // Success and Error Handling
         Connections {
             target: authManager
@@ -407,6 +418,7 @@ Window {
                                loginerrorDialog.open();
                            }
         }
+
         // Error Dialog
         Dialog {
             id: loginerrorDialog
@@ -466,6 +478,7 @@ Window {
                 }
             }
         }
+
         // Back Button
         Button {
             text: "Back"
@@ -508,6 +521,7 @@ Window {
         id: selectionPage
         anchors.fill: parent
         visible: false
+
         // Title
         Text {
             x: 239
@@ -563,6 +577,7 @@ Window {
             anchors.topMargin: 760
             z: -22
         }
+
         // Toggle
         Item {
             anchors.centerIn: parent
@@ -646,6 +661,7 @@ Window {
                 }
             }
         }
+
         // Sign Out Button
         Button {
             text: "Sign Out"
@@ -690,6 +706,7 @@ Window {
         id: automaticControlPage
         anchors.fill: parent
         visible: false
+
         // Title
         Text {
             x: 239
@@ -745,6 +762,7 @@ Window {
             anchors.topMargin: 760
             z: -22
         }
+
         // Status & Battery Display
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -808,6 +826,7 @@ Window {
                 }
             }
         }
+
         // Camera & Map Feed
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -837,6 +856,7 @@ Window {
                 }
             }
         }
+
         // Pick & Drop
         Row {
             x: 450
@@ -927,6 +947,7 @@ Window {
                 }
             }
         }
+
         // QR Scan Button
         Button {
             y: 503
@@ -959,6 +980,7 @@ Window {
                 console.log("QR Scan initiated!")
             }
         }
+
         // Execute Button
         Button {
             text: "Execute"
@@ -990,6 +1012,7 @@ Window {
                 console.log("Selected Location: " + locationDropdown.currentText)
             }
         }
+
         // Emergency Button
         Button {
             text: "Emergency Stop"
@@ -1019,8 +1042,11 @@ Window {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            onClicked: console.log("Emergency Stop Triggered!")
+            onClicked: console.log("Emergency Stop Triggered!") &
+                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
         }
+
         // Back Button
         Button {
             text: "Back"
@@ -1062,6 +1088,7 @@ Window {
         id: manualControlPage
         visible: false
         anchors.fill: parent
+
         // Title
         Text {
             x: 239
@@ -1136,6 +1163,7 @@ Window {
             color: "#525ed4"
             z: -22
         }
+
         // Robot Movement
         Text {
             x: 1142
@@ -1179,37 +1207,45 @@ Window {
                                     switch (event.key) {
                                         case 16777235: // Numpad 8
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         case 16777237: // Numpad 2
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         case 16777234: // Numpad 4
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         break;
                                         case 16777236: // Numpad 6
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         break;
                                         case 16777233: // Numpad 7
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         break;
                                         case 16777239: // Numpad 9
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         break;
                                         case 16777232: // Numpad 1
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         break;
                                         case 16777238: // Numpad 3
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         break;
                                         case 16777227: // Numpad 5
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         default:
                                         console.log("Unknown Key:", event.key);
                                     }
                                 }
             }
-
             Column {
                 id: movementGrid
                 spacing: controlPanel.spacing
@@ -1222,7 +1258,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move North-West") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}')
+                        onClicked: console.log("Move North-West") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1231,7 +1269,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Forward") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                        onClicked: console.log("Move Forward") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1240,7 +1280,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move North-East") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}')
+                        onClicked: console.log("Move North-East") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
                 }
@@ -1253,7 +1295,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Left") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}')
+                        onClicked: console.log("Move Left") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1262,7 +1306,9 @@ Window {
                         width: controlPanel.stopSize
                         height: controlPanel.stopSize
                         font.pointSize: 16
-                        onClicked: console.log("STOP") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                        onClicked: console.log("STOP") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
                         background: Rectangle { color: "red"; radius: 10 }
                     }
 
@@ -1271,7 +1317,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Right") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}')
+                        onClicked: console.log("Move Right") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
                 }
@@ -1284,7 +1332,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move South-West") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":1.0}}}')
+                        onClicked: console.log("Move South-West") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1293,7 +1343,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move Backward") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                        onClicked: console.log("Move Backward") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
 
@@ -1302,7 +1354,9 @@ Window {
                         width: controlPanel.buttonSize
                         height: controlPanel.buttonSize
                         font.pointSize: 22
-                        onClicked: console.log("Move South-East") & rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-1.0}}}')
+                        onClicked: console.log("Move South-East") &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
+                                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
                         background: Rectangle { color: "#bbc4ca"; radius: 10 }
                     }
                 }
@@ -1312,6 +1366,7 @@ Window {
                 anchors.topMargin: 150
             }
         }
+
         // Mechanism Control
         Text {
             x: 1188
@@ -1382,6 +1437,7 @@ Window {
                 }
             }
         }
+
         // Camera & Map Feed
         Rectangle {
             x: 20
@@ -1405,6 +1461,7 @@ Window {
             anchors.topMargin: 209
             Text { anchors.centerIn: parent; text: "Map"; color: "black" }
         }
+
         // Status & Battery Display
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -1412,7 +1469,7 @@ Window {
             anchors.topMargin: 20
             spacing: 10
 
-            // Status Display
+            //  Status Display
             Row {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1429,9 +1486,38 @@ Window {
                     text: "Idle"
                     font.pointSize: 16
                     font.bold: true
-                    color: "green"
+                    color: "orange"
+                }
+
+                Connections {
+                    target: rosConnector
+
+                    onMessageReceived: function(message) {
+                        try {
+                            let data = JSON.parse(message);
+                            console.log("Received message for status:", data);
+                            if (data.topic === "/hoverboard/connected") {
+                                let status = data.msg.data;
+                                updateStatus(status);
+                            }
+                        } catch (e) {
+                            console.error("Error parsing message:", e);
+                        }
+                    }
+                }
+
+                function updateStatus(status) {
+                    console.log("Status update:", status);
+                    if (status === false) {
+                        mstatusLabel.text = "Idle";
+                        mstatusLabel.color = "orange";
+                    } else if (status === true) {
+                        mstatusLabel.text = "Busy";
+                        mstatusLabel.color = "red";
+                    }
                 }
             }
+
             // Battery Level Display
             Column {
                 spacing: 5
@@ -1450,10 +1536,49 @@ Window {
 
                     Label {
                         id: mbatteryPercentage
-                        text: "75%"
+                        text: "0%"
                         font.pointSize: 14
                         font.bold: true
-                        color: "green"
+                    }
+
+                    Timer {
+                        id: batterySubscribeTimer
+                        interval: 1000
+                        running: true
+                        repeat: true
+                    }
+                    Connections {
+                        target: rosConnector
+
+                        onMessageReceived: function(message) {
+                            try {
+                                let data = JSON.parse(message);
+                                console.log("Received battery message:", data);
+                                if (data.topic === "/hoverboard/battery_voltage") {
+                                    let voltage = data.msg.data
+
+                                    // Map 33V–42V to 0%–100%
+                                    let percentage = ((voltage - 33) / (42 - 33)) * 100
+                                    percentage = Math.min(100, Math.max(0, percentage))
+
+                                    mbatteryPercentage.text = Math.round(percentage) + "%"
+                                    mbatteryBar.width = 200 * (percentage / 100)
+
+                                    if (percentage > 60) {
+                                        mbatteryPercentage.color = "green"
+                                        mbatteryBar.color = "green"
+                                    } else if (percentage > 30) {
+                                        mbatteryPercentage.color = "orange"
+                                        mbatteryBar.color = "orange"
+                                    } else {
+                                        mbatteryPercentage.color = "red"
+                                        mbatteryBar.color = "red"
+                                    }
+                                }
+                            } catch (e) {
+                                console.log("Battery message parse error:", e)
+                            }
+                        }
                     }
                 }
 
@@ -1465,12 +1590,11 @@ Window {
 
                     Rectangle {
                         id: mbatteryBar
-                        width: parent.width * 0.75
                         height: parent.height
                         radius: 5
-                        color: "green"
                     }
                 }
+
                 // Charge Button
                 Button {
                     id: chargeButton
@@ -1501,6 +1625,7 @@ Window {
                 }
             }
         }
+
         // Back Button
         Button {
             text: "Back"
