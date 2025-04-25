@@ -53,6 +53,50 @@
                     "access": "public",
                     "name": "connectionStatusChanged",
                     "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "poseReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "mapReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "globalPathReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "localPathReceived",
+                    "returnType": "void"
                 }
             ],
             "slots": [

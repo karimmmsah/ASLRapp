@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtMultimedia
 
 // Main
 Window {
@@ -762,6 +763,33 @@ Window {
             anchors.topMargin: 760
             z: -22
         }
+        Rectangle {
+            x: 1100
+            y: 55
+            width: 266
+            height: 57
+            opacity: 0.7
+            color: "#525ed4"
+            z: -22
+        }
+        Text {
+            x: 1142
+            width: 90
+            height: 40
+            color: "#f8f9fA"
+            text: qsTr("Pick & Drop")
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 120
+            anchors.topMargin: 65
+            font.pixelSize: 24
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            layer.enabled: false
+            font.styleName: "Bold"
+            font.bold: true
+            font.family: "Tahoma"
+        }
 
         // Status & Battery Display
         Column {
@@ -770,6 +798,7 @@ Window {
             anchors.topMargin: 20
             spacing: 10
 
+            // Status Display
             Row {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -786,109 +815,284 @@ Window {
                     text: "Idle"
                     font.pointSize: 16
                     font.bold: true
-                    color: "green"
+                    color: "orange"
+                }
+
+                Connections {
+                    target: rosConnector
+
+                    onMessageReceived: function(message) {
+                        try {
+                            let data = JSON.parse(message);
+                            console.log("Received message for status:", data);
+                            if (data.topic === "/hoverboard/connected") {
+                                let status = data.msg.data;
+                                updateStatus(status);
+                            }
+                        } catch (e) {
+                            console.error("Error parsing message:", e);
+                        }
+                    }
+                }
+
+                function updateStatus(status) {
+                    console.log("Status update:", status);
+                    if (status === false) {
+                        statusLabel.text = "Idle";
+                        statusLabel.color = "orange";
+                    } else if (status === true) {
+                        statusLabel.text = "Busy";
+                        statusLabel.color = "red";
+                    }
                 }
             }
 
-            Row {
+            // Battery Level Display
+            Column {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                Label {
-                    text: "Battery:"
-                    font.pointSize: 14
-                    font.bold: true
-                    color: "black"
-                }
+                Row {
+                    spacing: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
 
-                Label {
-                    id: batteryPercentage
-                    text: "75%"
-                    font.pointSize: 14
-                    font.bold: true
-                    color: "green"
-                }
-            }
+                    Label {
+                        text: "Battery:"
+                        font.pointSize: 14
+                        font.bold: true
+                        color: "black"
+                    }
 
-            Rectangle {
-                width: 200
-                height: 15
-                radius: 5
-                color: "#E0E0E0"
-                anchors.horizontalCenter: parent.horizontalCenter
+                    Label {
+                        id: batteryPercentageLabel
+                        text: " 0%"
+                        font.pointSize: 14
+                        font.bold: true
+                    }
+
+                    Timer {
+                        id: batterySubscribeTimer
+                        interval: 1000
+                        running: true
+                        repeat: true
+                    }
+
+                    Connections {
+                        target: rosConnector
+
+                        onMessageReceived: function(message) {
+                            try {
+                                let data = JSON.parse(message);
+                                console.log("Received battery message:", data);
+                                if (data.topic === "/hoverboard/battery_voltage") {
+                                    let voltage = data.msg.data;
+
+                                    // Map 33V–42V to 0%–100%
+                                    let percentage = ((voltage - 33) / (42 - 33)) * 100;
+                                    percentage = Math.min(100, Math.max(0, percentage));
+
+                                    batteryPercentageLabel.text = Math.round(percentage) + "%";
+                                    batteryBar.width = 200 * (percentage / 100);
+
+                                    if (percentage > 60) {
+                                        batteryPercentageLabel.color = "green";
+                                        batteryBar.color = "green";
+                                    } else if (percentage > 30) {
+                                        batteryPercentageLabel.color = "orange";
+                                        batteryBar.color = "orange";
+                                    } else {
+                                        batteryPercentageLabel.color = "red";
+                                        batteryBar.color = "red";
+                                    }
+                                }
+                            } catch (e) {
+                                console.log("Battery message parse error:", e);
+                            }
+                        }
+                    }
+                }
 
                 Rectangle {
-                    id: batteryBar
-                    width: parent.width * 0.75
-                    height: parent.height
+                    width: 200
+                    height: 15
                     radius: 5
-                    color: "green"
+                    color: "#E0E0E0"
+
+                    Rectangle {
+                        id: batteryBar
+                        height: parent.height
+                        radius: 5
+                    }
                 }
             }
         }
 
-        // Camera & Map Feed
+        // Digital Twin
         Row {
+            id: cameraMapRow
+            property real mapScale: 100
+            property real mapWidth: digitalTwinMap.width
+            property real mapHeight: digitalTwinMap.height
+
+            // Robot position and rotation
+            property real robotX: mapWidth / 2 - 12.5 - 40
+            property real robotY: mapHeight / 2 - 12.5 - 10
+            property real robotRotation: 0
+
+            // AMCL origin for relative positioning
+            property real originX: undefined
+            property real originY: undefined
+
+            // Coordinate conversion from meters to pixels
+            function metersToPixelsX(x) {
+                return (x - originX) * mapScale + mapWidth / 2;
+            }
+
+            function metersToPixelsY(y) {
+                return mapHeight / 2 - (y - originY) * mapScale;
+            }
+
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.topMargin: 180
+            anchors.right: parent.right
+            anchors.topMargin: 200
+            anchors.rightMargin: 100
             spacing: 30
 
             Rectangle {
-                width: 500
-                height: 300
-                color: "#cccccc"
-                Text {
-                    anchors.centerIn: parent
-                    text: "Camera Feed"
-                    color: "black"
+                id: digitalTwinMap
+                width: 600
+                height: 350
+                color: "#f0f0f0"
+
+                Image {
+                    id: mapImage
+                    anchors.fill: parent
+                    source: "qrc:/Images/mapsmallwarehousec.png"
+                }
+
+                Canvas {
+                    id: pathCanvas
+                    anchors.fill: parent
+                    property var globalPath: []
+
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = "blue";
+
+                        if (globalPath.length > 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(globalPath[0].x, globalPath[0].y);
+                            for (var i = 1; i < globalPath.length; i++) {
+                                ctx.lineTo(globalPath[i].x, globalPath[i].y);
+                            }
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Robot Icon
+                Image {
+                    id: robotIcon
+                    source: "qrc:/Images/robot_icon.png"
+                    width: 25
+                    height: 25
+                    x: cameraMapRow.robotX
+                    y: cameraMapRow.robotY
+                    rotation: cameraMapRow.robotRotation
+                    transformOrigin: Item.Center
+                    smooth: true
+                    antialiasing: true
                 }
             }
 
-            Rectangle {
-                width: 500
-                height: 300
-                color: "#cccccc"
-                Text {
-                    anchors.centerIn: parent
-                    text: "Map"
-                    color: "black"
+            NumberAnimation on robotX {
+                id: robotIconNumberAnimationX
+                duration: 200
+            }
+
+            NumberAnimation on robotY {
+                id: robotIconNumberAnimationY
+                duration: 200
+            }
+
+            Connections {
+                target: rosConnector
+
+                function onPoseReceived(json) {
+                    var pose = JSON.parse(json);
+                    var x = pose.position.x;
+                    var y = pose.position.y;
+                    var q = pose.orientation;
+
+                    console.log("Received Robot Position -> X:", x, "Y:", y);
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                        cameraMapRow.originX = x;
+                        cameraMapRow.originY = y;
+                        console.log("Origin set to:", x, y);
+                    }
+
+                    cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
+                    cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
+                    cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                }
+
+                function onGlobalPathReceived(json) {
+                    var arr = JSON.parse(json);
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                        console.log("Skipping path drawing until origin is known.");
+                        return;
+                    }
+
+                    pathCanvas.globalPath = arr.map(p => ({
+                                                              x: cameraMapRow.metersToPixelsX(p.pose.position.x),
+                                                              y: cameraMapRow.metersToPixelsY(p.pose.position.y)
+                                                          }));
+                    pathCanvas.requestPaint();
                 }
             }
         }
 
-        // Pick & Drop
-        Row {
-            x: 450
-            y: 500
-            spacing: 100
+        // Pick, Drop, QR Scan
+        Column {
+            id: mLeftControlColumn
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 150
+            anchors.rightMargin: 80
+            spacing: 50
 
+            // Pick Section
             Column {
                 spacing: 10
 
                 Label {
-                    text: "Pick:"
+                    text: "START"
                     font.pointSize: 16
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     font.italic: false
-                    font.underline: true
+                    font.underline: false
                 }
 
                 ComboBox {
-                    id: shelfDropdown
+                    id: mShelfDropdown
                     width: 170
                     height: 40
                     model: ["Shelf A", "Shelf B", "Shelf C"]
 
                     background: Rectangle {
-                        color: "#434040"
+                        color: "#bbc4ca"
                         radius: 8
                     }
 
                     contentItem: Text {
-                        text: shelfDropdown.currentText
-                        color: "white"
+                        text: mShelfDropdown.currentText
+                        color: "black"
                         font.pointSize: 14
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
@@ -898,39 +1102,42 @@ Window {
                         width: 20
                         height: 20
                         radius: 5
-                        color: "white"
+                        color: "black"
                         anchors.right: parent.right
                         anchors.rightMargin: 10
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
                     }
                 }
             }
 
+            // Drop Section
             Column {
                 spacing: 10
 
                 Label {
-                    text: "Drop:"
+                    text: "END"
                     font.pointSize: 16
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
-                    font.underline: true
+                    font.underline: false
                     font.italic: false
                 }
 
                 ComboBox {
-                    id: locationDropdown
+                    id: mLocationDropdown
                     width: 170
                     height: 40
                     model: ["Location 1", "Location 2", "Location 3"]
 
                     background: Rectangle {
-                        color: "#434040"
+                        color: "#bbc4ca"
                         radius: 8
                     }
 
                     contentItem: Text {
-                        text: locationDropdown.currentText
-                        color: "white"
+                        text: mLocationDropdown.currentText
+                        color: "black"
                         font.pointSize: 14
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
@@ -940,44 +1147,73 @@ Window {
                         width: 20
                         height: 20
                         radius: 5
-                        color: "white"
+                        color: "black"
                         anchors.right: parent.right
                         anchors.rightMargin: 10
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
                     }
                 }
             }
         }
 
-        // QR Scan Button
-        Button {
-            y: 503
-            text: "QR SCAN"
-            anchors.left: parent.left
-            width: 150
-            height: 50
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 165
-            anchors.bottomMargin: 215
-            font.bold: true
-            font.pointSize: 14
+        // QR Scan
+        Item {
+            id: qrScanner
+            width: parent.width
+            height: parent.height
 
-            background: Rectangle {
-                color: "#1976D2"
-                radius: 10
+            property bool cameraVisible: false
+            property real cameraWidth: cameraVisible ? 600 : 0
+            property real cameraHeight: cameraVisible ? 500 : 0
+
+            Camera {
+                id: camera
+                active: qrScanner.cameraVisible
             }
 
-            contentItem: Text {
-                text: parent.text
-                font.pixelSize: 18
+            CaptureSession {
+                id: captureSession
+                camera: camera
+                videoOutput: viewfinder
+            }
+
+            VideoOutput {
+                id: viewfinder
+                anchors.centerIn: parent
+                width: qrScanner.cameraWidth
+                height: qrScanner.cameraHeight
+                visible: qrScanner.cameraVisible
+                fillMode: VideoOutput.PreserveAspectFit
+            }
+
+            Button {
+                id: toggleButton
+                width: 160
+                height: 50
+                x: parent.width - width - 90
+                y: 420
+                text: qrScanner.cameraVisible ? "CLOSE QR CAMERA" : "OPEN QR CAMERA"
+
+                font.pointSize: 12
                 font.bold: true
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.family: "Tahoma"
-            }
 
-            onClicked: {
-                console.log("QR Scan initiated!")
+                background: Rectangle {
+                    color: qrScanner.cameraVisible ? "#388E3C" : "#008080"  // Red when open, green when closed
+                    radius: 12
+                }
+
+                contentItem: Text {
+                    text: toggleButton.text
+                    color: "white"
+                    font: toggleButton.font
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    qrScanner.cameraVisible = !qrScanner.cameraVisible
+                }
             }
         }
 
@@ -1019,13 +1255,13 @@ Window {
             width: 160
             height: 60
             font.bold: true
-            font.pointSize: 11
+            font.pointSize: 13
             font.family: "Tahoma"
 
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.right: parent.right
             anchors.top: parent.top
-            anchors.topMargin: 590
-            anchors.horizontalCenterOffset: 518
+            anchors.rightMargin: 90
+            anchors.topMargin: 520
 
             background: Rectangle {
                 color: "red";
@@ -1035,7 +1271,7 @@ Window {
             contentItem: Text {
                 text: "Emergency Stop"
                 font.bold: true
-                font.pointSize: 11
+                font.pointSize: 12
                 font.family: "Tahoma"
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
@@ -1206,46 +1442,64 @@ Window {
 
                                     switch (event.key) {
                                         case 16777235: // Numpad 8
+                                        console.log("Move Forward");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         case 16777237: // Numpad 2
+                                        console.log("Move Backward");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         break;
                                         case 16777234: // Numpad 4
+                                        console.log("Move Left");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         break;
                                         case 16777236: // Numpad 6
+                                        console.log("Move Right");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         break;
                                         case 16777233: // Numpad 7
+                                        console.log("Move North-West");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         break;
                                         case 16777239: // Numpad 9
+                                        console.log("Move North-East");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         break;
                                         case 16777232: // Numpad 1
+                                        console.log("Move South-West");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         break;
                                         case 16777238: // Numpad 3
+                                        console.log("Move South-East");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         break;
                                         case 16777227: // Numpad 5
+                                        console.log("STOP");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        break;
+                                        case Qt.Key_A: // A key for Ascend
+                                        console.log("Lift Ascend");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        break;
+                                        case Qt.Key_D: // D key for Descend
+                                        console.log("Lift Descend (D key)");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
                                         break;
                                         default:
                                         console.log("Unknown Key:", event.key);
                                     }
                                 }
             }
+
             Column {
                 id: movementGrid
                 spacing: controlPanel.spacing
@@ -1408,7 +1662,16 @@ Window {
                 anchors.topMargin: 530
                 font.bold: false
                 font.family: "Tahoma"
-                onClicked: console.log("Lift Ascend")
+                onClicked: {
+                    console.log("Lift Ascend");
+                    rosConnector.sendMessage(JSON.stringify({
+                                                                op: "publish",
+                                                                topic: "/linear_actuator_cmd",
+                                                                msg: {
+                                                                    data: "1"
+                                                                }
+                                                            }));
+                }
 
                 background: Rectangle {
                     color: "#bbc4ca"
@@ -1429,7 +1692,16 @@ Window {
                 anchors.leftMargin: -130
                 anchors.topMargin: 530
                 font.family: "Tahoma"
-                onClicked: console.log("Lift Descend")
+                onClicked: {
+                    console.log("Lift Descend");
+                    rosConnector.sendMessage(JSON.stringify({
+                                                                op: "publish",
+                                                                topic: "/linear_actuator_cmd",
+                                                                msg: {
+                                                                    data: "0"
+                                                                }
+                                                            }));
+                }
 
                 background: Rectangle {
                     color: "#bbc4ca"
@@ -1437,29 +1709,137 @@ Window {
                 }
             }
         }
+        // Digital Twin
+        Row {
+            id: mCameraMapRow
+            property real mapScale: 100
+            property real mapWidth: mDigitalTwinMap.width
+            property real mapHeight: mDigitalTwinMap.height
 
-        // Camera & Map Feed
-        Rectangle {
-            x: 20
-            width: 500
-            height: 405
-            color: "#cccccc"
-            anchors.right: parent.horizontalCenter
-            anchors.top: parent.top
-            anchors.rightMargin: 160
-            anchors.topMargin: 209
-            Text { anchors.centerIn: parent; text: "Camera Feed"; color: "black" }
-        }
+            // Robot position and rotation
+            property real robotX: mapWidth / 2 - 12.5 - 40
+            property real robotY: mapHeight / 2 - 12.5 - 10
+            property real robotRotation: 0
 
-        Rectangle {
-            width: 470
-            height: 405
-            color: "#cccccc"
-            anchors.left: parent.horizontalCenter
+            // AMCL origin for relative positioning
+            property real originX: undefined
+            property real originY: undefined
+
+            // Coordinate conversion from meters to pixels
+            function metersToPixelsX(x) {
+                return (x - originX) * mapScale + mapWidth / 2;
+            }
+
+            function metersToPixelsY(y) {
+                return mapHeight / 2 - (y - originY) * mapScale;
+            }
+
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.leftMargin: -145
-            anchors.topMargin: 209
-            Text { anchors.centerIn: parent; text: "Map"; color: "black" }
+            anchors.right: parent.right
+            anchors.topMargin: 200
+            anchors.rightMargin: 50
+            spacing: 30
+
+            Rectangle {
+                id: mDigitalTwinMap
+                width: 600
+                height: 350
+                color: "#f0f0f0"
+
+                Image {
+                    id: mMapImage
+                    anchors.fill: parent
+                    source: "qrc:/Images/mapsmallwarehousec.png"
+                }
+
+                Canvas {
+                    id: mPathCanvas
+                    anchors.fill: parent
+                    property var globalPath: []
+
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = "blue";
+
+                        if (globalPath.length > 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(globalPath[0].x, globalPath[0].y);
+                            for (var i = 1; i < globalPath.length; i++) {
+                                ctx.lineTo(globalPath[i].x, globalPath[i].y);
+                            }
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Robot Icon
+                Image {
+                    id: mRobotIcon
+                    source: "qrc:/Images/robot_icon.png"
+                    width: 25
+                    height: 25
+                    x: mCameraMapRow.robotX
+                    y: mCameraMapRow.robotY
+                    rotation: mCameraMapRow.robotRotation
+                    transformOrigin: Item.Center
+                    smooth: true
+                    antialiasing: true
+                }
+            }
+
+            NumberAnimation on robotX {
+                id: mRobotIconNumberAnimationX
+                duration: 200
+            }
+
+            NumberAnimation on robotY {
+                id: mRobotIconNumberAnimationY
+                duration: 200
+            }
+
+            Connections {
+                target: rosConnector
+
+                function onPoseReceived(json) {
+                    var pose = JSON.parse(json);
+                    var x = pose.position.x;
+                    var y = pose.position.y;
+                    var q = pose.orientation;
+
+                    console.log("Received Robot Position -> X:", x, "Y:", y);
+
+                    if (mCameraMapRow.originX === undefined || mCameraMapRow.originY === undefined) {
+                        mCameraMapRow.originX = x;
+                        mCameraMapRow.originY = y;
+                        console.log("Origin set to:", x, y);
+                    }
+
+                    mCameraMapRow.robotX = mCameraMapRow.metersToPixelsX(x);
+                    mCameraMapRow.robotY = mCameraMapRow.metersToPixelsY(y);
+                    mCameraMapRow.robotRotation = Math.atan2(
+                                2.0 * (q.w * q.z),
+                                1.0 - 2.0 * (q.z * q.z)
+                                ) * 180 / Math.PI;
+                }
+
+                function onGlobalPathReceived(json) {
+                    var arr = JSON.parse(json);
+
+                    if (mCameraMapRow.originX === undefined || mCameraMapRow.originY === undefined) {
+                        console.log("Skipping path drawing until origin is known.");
+                        return;
+                    }
+
+                    mPathCanvas.globalPath = arr.map(p => ({
+                                                               x: mCameraMapRow.metersToPixelsX(p.pose.position.x),
+                                                               y: mCameraMapRow.metersToPixelsY(p.pose.position.y)
+                                                           }));
+                    mPathCanvas.requestPaint();
+                }
+            }
         }
 
         // Status & Battery Display
@@ -1536,13 +1916,13 @@ Window {
 
                     Label {
                         id: mbatteryPercentage
-                        text: "0%"
+                        text: " 0%"
                         font.pointSize: 14
                         font.bold: true
                     }
 
                     Timer {
-                        id: batterySubscribeTimer
+                        id: mbatterySubscribeTimer
                         interval: 1000
                         running: true
                         repeat: true

@@ -10,8 +10,16 @@
 	"INPUTS" : 
 	[
 		"C:/Users/HP/Documents/Qt/FrontEnd/Images/Icon.png",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/my_map.pgm",
 		"C:/Users/HP/Documents/Qt/FrontEnd/Images/ASU.png",
-		"C:/Users/HP/Documents/Qt/FrontEnd/Images/AI_Warehouse.jpg"
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/AI_Warehouse.jpg",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/map.jpeg",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/warehouse.pgm",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/robot_icon.png",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/mapsmallwarehouse.png",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/warehouse_v2.pgm",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/mapsmallwarehousec.png",
+		"C:/Users/HP/Documents/Qt/FrontEnd/Images/mapsmallwarehouse.pgm"
 	],
 	"LOCK_FILE" : "C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/CMakeFiles/appFrontEnd_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,

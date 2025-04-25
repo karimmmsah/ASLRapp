@@ -2,6 +2,9 @@ C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/appFrontEnd_auto
   C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/appFrontEnd_autogen/moc_predefs.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QDebug \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QFlags \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QJsonArray \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QJsonDocument \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QJsonObject \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QObject \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QSharedDataPointer \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/QString \
@@ -24,6 +27,8 @@ C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/appFrontEnd_auto
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qbytearraylist.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qbytearrayview.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qcalendar.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qcborcommon.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qcborvalue.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qchar.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qcompare.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qcompare_impl.h \
@@ -53,6 +58,10 @@ C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/appFrontEnd_auto
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qiodevicebase.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qiterable.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qiterator.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qjsonarray.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qjsondocument.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qjsonobject.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qjsonvalue.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qlist.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qlocale.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qlogging.h \
@@ -72,6 +81,7 @@ C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/appFrontEnd_auto
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qpair.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qprocessordetection.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qrefcount.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qregularexpression.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qscopedpointer.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qscopeguard.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qset.h \
@@ -112,6 +122,7 @@ C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Debug/appFrontEnd_auto
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qtypes.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qurl.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qutf8stringview.h \
+  D:/Software/Qt/6.5.3/mingw_64/include/QtCore/quuid.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qvariant.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qvarlengtharray.h \
   D:/Software/Qt/6.5.3/mingw_64/include/QtCore/qversiontagging.h \

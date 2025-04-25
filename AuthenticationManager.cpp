@@ -35,7 +35,7 @@ void AuthenticationManager::loginUser(const QString &email, const QString &passw
 
     QNetworkReply *reply = networkManager->post(request, jsonData);
 
-    QObject::connect(reply, &QNetworkReply::finished, [=]() {
+    QObject::connect(reply, &QNetworkReply::finished, this, [=]() {
         QByteArray responseData = reply->readAll();
         QJsonDocument jsonResponse = QJsonDocument::fromJson(responseData);
         QJsonObject jsonObject = jsonResponse.object();
@@ -57,4 +57,5 @@ void AuthenticationManager::loginUser(const QString &email, const QString &passw
         }
         reply->deleteLater();
     });
+
 }

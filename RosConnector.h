@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QtWebSockets/QWebSocket>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class RosConnector : public QObject {
     Q_OBJECT
@@ -11,7 +14,7 @@ class RosConnector : public QObject {
 
 public:
     explicit RosConnector(QObject *parent = nullptr);
-
+    void onMessageReceived(const QString &message);
     Q_INVOKABLE void connectToRos();
     Q_INVOKABLE void sendMessage(const QString &message);
     bool isConnected() const { return m_isConnected; } 
@@ -20,6 +23,10 @@ signals:
     void connectedToRos();
     void connectionFailed();
     void connectionStatusChanged();
+    void poseReceived(const QString &json);
+    void mapReceived(const QString &json);
+    void globalPathReceived(const QString &json);
+    void localPathReceived(const QString &json);
 
 private slots:
     void onConnected();
@@ -28,6 +35,7 @@ private slots:
 private:
     QWebSocket webSocket;
     bool m_isConnected = false;
+    void subscribeToTopics();
 };
 
 #endif // ROSCONNECTOR_H
