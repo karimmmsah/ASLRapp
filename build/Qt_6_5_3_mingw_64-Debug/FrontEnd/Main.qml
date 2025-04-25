@@ -1488,11 +1488,15 @@ Window {
                                         break;
                                         case Qt.Key_A: // A key for Ascend
                                         console.log("Lift Ascend");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
                                         break;
                                         case Qt.Key_D: // D key for Descend
-                                        console.log("Lift Descend (D key)");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
+                                        console.log("Lift Descend");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        break;
+                                        case Qt.Key_X: // X key for Lift Stop
+                                        console.log("Lift Stop");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"x"}}');
                                         break;
                                         default:
                                         console.log("Unknown Key:", event.key);
@@ -1668,7 +1672,7 @@ Window {
                                                                 op: "publish",
                                                                 topic: "/linear_actuator_cmd",
                                                                 msg: {
-                                                                    data: "1"
+                                                                    data: "0"
                                                                 }
                                                             }));
                 }
@@ -1698,7 +1702,36 @@ Window {
                                                                 op: "publish",
                                                                 topic: "/linear_actuator_cmd",
                                                                 msg: {
-                                                                    data: "0"
+                                                                    data: "1"
+                                                                }
+                                                            }));
+                }
+
+                background: Rectangle {
+                    color: "#bbc4ca"
+                    radius: mechanismControl.buttonRadius
+                }
+            }
+            // Stop Button
+            Button {
+                id: stoplift
+                width: 100
+                text: "Stop"
+                focusPolicy: Qt.NoFocus
+                height: mechanismControl.buttonHeight
+                font.pointSize: 16
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.leftMargin: -200
+                anchors.topMargin: 600
+                font.family: "Tahoma"
+                onClicked: {
+                    console.log("Stop Lift");
+                    rosConnector.sendMessage(JSON.stringify({
+                                                                op: "publish",
+                                                                topic: "/linear_actuator_cmd",
+                                                                msg: {
+                                                                    data: "x"
                                                                 }
                                                             }));
                 }
@@ -1709,6 +1742,7 @@ Window {
                 }
             }
         }
+
         // Digital Twin
         Row {
             id: mCameraMapRow
