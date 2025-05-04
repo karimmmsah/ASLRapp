@@ -1,11 +1,12 @@
 {
-	"backtrace" : 4,
+	"backtrace" : 5,
 	"backtraceGraph" : 
 	{
 		"commands" : 
 		[
 			"add_custom_target",
-			"_qt_internal_qml_type_registration",
+			"_qt_internal_target_enable_qmllint",
+			"qt6_target_qml_sources",
 			"qt6_add_qml_module",
 			"qt_add_qml_module",
 			"add_dependencies"
@@ -21,46 +22,56 @@
 				"file" : 1
 			},
 			{
-				"command" : 3,
+				"command" : 4,
 				"file" : 1,
-				"line" : 15,
+				"line" : 29,
 				"parent" : 0
 			},
 			{
-				"command" : 2,
+				"command" : 3,
 				"file" : 0,
 				"line" : 686,
 				"parent" : 1
 			},
 			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 610,
+				"parent" : 2
+			},
+			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 517,
-				"parent" : 2
+				"line" : 2090,
+				"parent" : 3
 			},
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 2568,
-				"parent" : 3
+				"line" : 885,
+				"parent" : 4
 			},
 			{
-				"command" : 4,
+				"command" : 5,
 				"file" : 0,
-				"line" : 2571,
-				"parent" : 3
+				"line" : 888,
+				"parent" : 4
 			}
 		]
 	},
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 5,
-			"id" : "appFrontEnd_qmltyperegistration::@6890427a1f51a3e7e1df"
+			"backtrace" : 6,
+			"id" : "appFrontEnd_qmllint_json::@6890427a1f51a3e7e1df"
 		}
 	],
-	"id" : "all_qmltyperegistrations::@6890427a1f51a3e7e1df",
-	"name" : "all_qmltyperegistrations",
+	"folder" : 
+	{
+		"name" : "QmlLinter"
+	},
+	"id" : "all_qmllint_json::@6890427a1f51a3e7e1df",
+	"name" : "all_qmllint_json",
 	"paths" : 
 	{
 		"build" : ".",

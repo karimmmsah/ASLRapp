@@ -51,13 +51,14 @@ static constexpr auto qt_meta_stringdata_CLASSRosConnectorENDCLASS = QtMocHelper
     "onConnected",
     "onDisconnected",
     "connectToRos",
+    "goToChargingStation",
     "sendMessage",
     "message",
     "isConnected"
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSRosConnectorENDCLASS_t {
-    uint offsetsAndSizes[32];
+    uint offsetsAndSizes[34];
     char stringdata0[13];
     char stringdata1[15];
     char stringdata2[1];
@@ -71,9 +72,10 @@ struct qt_meta_stringdata_CLASSRosConnectorENDCLASS_t {
     char stringdata10[12];
     char stringdata11[15];
     char stringdata12[13];
-    char stringdata13[12];
-    char stringdata14[8];
-    char stringdata15[12];
+    char stringdata13[20];
+    char stringdata14[12];
+    char stringdata15[8];
+    char stringdata16[12];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSRosConnectorENDCLASS_t::offsetsAndSizes) + ofs), len 
@@ -92,9 +94,10 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSRosConnectorENDCLASS_t qt_meta_
         QT_MOC_LITERAL(137, 11),  // "onConnected"
         QT_MOC_LITERAL(149, 14),  // "onDisconnected"
         QT_MOC_LITERAL(164, 12),  // "connectToRos"
-        QT_MOC_LITERAL(177, 11),  // "sendMessage"
-        QT_MOC_LITERAL(189, 7),  // "message"
-        QT_MOC_LITERAL(197, 11)   // "isConnected"
+        QT_MOC_LITERAL(177, 19),  // "goToChargingStation"
+        QT_MOC_LITERAL(197, 11),  // "sendMessage"
+        QT_MOC_LITERAL(209, 7),  // "message"
+        QT_MOC_LITERAL(217, 11)   // "isConnected"
     },
     "RosConnector",
     "connectedToRos",
@@ -109,6 +112,7 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSRosConnectorENDCLASS_t qt_meta_
     "onConnected",
     "onDisconnected",
     "connectToRos",
+    "goToChargingStation",
     "sendMessage",
     "message",
     "isConnected"
@@ -123,29 +127,30 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
       11,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
-       1,  101, // properties
+      12,   14, // methods
+       1,  108, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        7,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   80,    2, 0x06,    2 /* Public */,
-       3,    0,   81,    2, 0x06,    3 /* Public */,
-       4,    0,   82,    2, 0x06,    4 /* Public */,
-       5,    1,   83,    2, 0x06,    5 /* Public */,
-       7,    1,   86,    2, 0x06,    7 /* Public */,
-       8,    1,   89,    2, 0x06,    9 /* Public */,
-       9,    1,   92,    2, 0x06,   11 /* Public */,
+       1,    0,   86,    2, 0x06,    2 /* Public */,
+       3,    0,   87,    2, 0x06,    3 /* Public */,
+       4,    0,   88,    2, 0x06,    4 /* Public */,
+       5,    1,   89,    2, 0x06,    5 /* Public */,
+       7,    1,   92,    2, 0x06,    7 /* Public */,
+       8,    1,   95,    2, 0x06,    9 /* Public */,
+       9,    1,   98,    2, 0x06,   11 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      10,    0,   95,    2, 0x08,   13 /* Private */,
-      11,    0,   96,    2, 0x08,   14 /* Private */,
+      10,    0,  101,    2, 0x08,   13 /* Private */,
+      11,    0,  102,    2, 0x08,   14 /* Private */,
 
  // methods: name, argc, parameters, tag, flags, initial metatype offsets
-      12,    0,   97,    2, 0x02,   15 /* Public */,
-      13,    1,   98,    2, 0x02,   16 /* Public */,
+      12,    0,  103,    2, 0x02,   15 /* Public */,
+      13,    0,  104,    2, 0x02,   16 /* Public */,
+      14,    1,  105,    2, 0x02,   17 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -162,10 +167,11 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
 
  // methods: parameters
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   14,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,   15,
 
  // properties: name, type, flags
-      15, QMetaType::Bool, 0x00015001, uint(2), 0,
+      16, QMetaType::Bool, 0x00015001, uint(2), 0,
 
        0        // eod
 };
@@ -205,6 +211,8 @@ Q_CONSTINIT const QMetaObject RosConnector::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'connectToRos'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'goToChargingStation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'sendMessage'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>
@@ -228,7 +236,8 @@ void RosConnector::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 7: _t->onConnected(); break;
         case 8: _t->onDisconnected(); break;
         case 9: _t->connectToRos(); break;
-        case 10: _t->sendMessage((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 10: _t->goToChargingStation(); break;
+        case 11: _t->sendMessage((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -315,13 +324,13 @@ int RosConnector::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 12)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 11;
+        _id -= 12;
     }else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::BindableProperty
             || _c == QMetaObject::RegisterPropertyMetaType) {

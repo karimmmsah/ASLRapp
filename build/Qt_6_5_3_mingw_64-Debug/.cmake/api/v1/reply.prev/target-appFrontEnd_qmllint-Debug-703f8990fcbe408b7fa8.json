@@ -23,7 +23,7 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 15,
+				"line" : 29,
 				"parent" : 0
 			},
 			{
@@ -47,7 +47,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 836,
+				"line" : 824,
 				"parent" : 4
 			}
 		]
@@ -62,8 +62,8 @@
 	{
 		"name" : "QmlLinter"
 	},
-	"id" : "appFrontEnd_qmllint_json::@6890427a1f51a3e7e1df",
-	"name" : "appFrontEnd_qmllint_json",
+	"id" : "appFrontEnd_qmllint::@6890427a1f51a3e7e1df",
+	"name" : "appFrontEnd_qmllint",
 	"paths" : 
 	{
 		"build" : ".",
@@ -91,13 +91,13 @@
 		{
 			"backtrace" : 5,
 			"isGenerated" : true,
-			"path" : "build/Qt_6_5_3_mingw_64-Debug/CMakeFiles/appFrontEnd_qmllint_json",
+			"path" : "build/Qt_6_5_3_mingw_64-Debug/CMakeFiles/appFrontEnd_qmllint",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 0,
 			"isGenerated" : true,
-			"path" : "build/Qt_6_5_3_mingw_64-Debug/CMakeFiles/appFrontEnd_qmllint_json.rule",
+			"path" : "build/Qt_6_5_3_mingw_64-Debug/CMakeFiles/appFrontEnd_qmllint.rule",
 			"sourceGroupIndex" : 1
 		}
 	],

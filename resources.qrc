@@ -1,15 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>Images/AI_Warehouse.jpg</file>
         <file>Images/ASU.png</file>
         <file>Images/Icon.png</file>
-        <file>Images/map.jpeg</file>
-        <file>Images/mapsmallwarehouse.pgm</file>
         <file>Images/mapsmallwarehouse.png</file>
-        <file>Images/mapsmallwarehousec.png</file>
-        <file>Images/my_map.pgm</file>
         <file>Images/robot_icon.png</file>
-        <file>Images/warehouse.pgm</file>
-        <file>Images/warehouse_v2.pgm</file>
+        <file>Main.qml</file>
+        <file>Images/1.png</file>
+        <file>Images/LiftRobot.png</file>
+        <file>Images/Logo.png</file>
     </qresource>
 </RCC>

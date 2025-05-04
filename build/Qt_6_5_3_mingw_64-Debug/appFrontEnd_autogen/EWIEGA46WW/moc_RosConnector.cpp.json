@@ -10,6 +10,11 @@
                 },
                 {
                     "access": "public",
+                    "name": "goToChargingStation",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
                     "arguments": [
                         {
                             "name": "message",
