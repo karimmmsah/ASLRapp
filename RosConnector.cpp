@@ -16,7 +16,6 @@ void RosConnector::onConnected() {
     m_isConnected = true;
     emit connectedToRos();
     emit connectionStatusChanged();
-
     subscribeToTopics();
 }
 
@@ -49,11 +48,13 @@ void RosConnector::subscribeToTopics() {
     subscribe("/hoverboard/connected", "std_msgs/Bool");
     subscribe("/hoverboard/battery_voltage", "std_msgs/Float64");
 
-    // Navigation / Map
+    // Navigation & Map
     subscribe("/amcl_pose", "geometry_msgs/PoseWithCovarianceStamped");
     subscribe("/map", "nav_msgs/OccupancyGrid");
     subscribe("/move_base/GlobalPlanner/plan", "nav_msgs/Path");
+    subscribe("/move_base/NavfnROS/plan", "nav_msgs/Path");
     subscribe("/move_base/DWAPlannerROS/local_plan", "nav_msgs/Path");
+    subscribe("/move_base_simple/goal", "geometry_msgs/PoseStamped");
 }
 
 void RosConnector::onMessageReceived(const QString &message) {
@@ -85,6 +86,46 @@ void RosConnector::onMessageReceived(const QString &message) {
         QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
         emit localPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
     }
+    else if (topic == "/move_base/DWAPlannerROS/global_plan") {
+        QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
+        emit globalPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
+    } else if (topic == "/move_base_simple/goal") {
+        QJsonObject pose = obj["msg"].toObject()["pose"].toObject();
+        emit goalReceived(QJsonDocument(pose).toJson(QJsonDocument::Compact));
+    }
+}
+
+void RosConnector::sendGoal(double x, double y) {
+    QJsonObject message;
+    message["op"] = "publish";
+    message["topic"] = "/move_base_simple/goal";
+    message["type"] = "geometry_msgs/PoseStamped";
+
+    QJsonObject msg;
+    QJsonObject header;
+    header["frame_id"] = "map";
+    msg["header"] = header;
+
+    QJsonObject position;
+    position["x"] = x;
+    position["y"] = y;
+    position["z"] = 0.0;
+
+    QJsonObject orientation;
+    orientation["x"] = 0.0;
+    orientation["y"] = 0.0;
+    orientation["z"] = 0.0;
+    orientation["w"] = 1.0;
+
+    QJsonObject pose;
+    pose["position"] = position;
+    pose["orientation"] = orientation;
+
+    msg["pose"] = pose;
+    message["msg"] = msg;
+
+    QJsonDocument doc(message);
+    sendMessage(QString::fromUtf8(doc.toJson(QJsonDocument::Compact)));
 }
 
 void RosConnector::goToChargingStation() {
@@ -93,22 +134,40 @@ void RosConnector::goToChargingStation() {
         return;
     }
 
-    // Coordinates
     double x = 1;
     double y = 1;
-    double theta = 0.0;
 
-    QJsonObject goal;
-    goal["x"] = x;
-    goal["y"] = y;
-    goal["theta"] = theta;
+    QJsonObject message;
+    message["op"] = "publish";
+    message["topic"] = "/move_base_simple/goal";
+    message["type"] = "geometry_msgs/PoseStamped";
 
     QJsonObject msg;
-    msg["op"] = "publish";
-    msg["topic"] = "/navigate_to";
-    msg["msg"] = goal;
+    QJsonObject header;
+    header["frame_id"] = "map";
+    msg["header"] = header;
 
-    QString jsonMsg = QJsonDocument(msg).toJson();
+    QJsonObject position;
+    position["x"] = x;
+    position["y"] = y;
+    position["z"] = 0.0;
+
+    QJsonObject orientation;
+    orientation["x"] = 0.0;
+    orientation["y"] = 0.0;
+    orientation["z"] = 0.0;
+    orientation["w"] = 1.0;
+
+    QJsonObject pose;
+    pose["position"] = position;
+    pose["orientation"] = orientation;
+
+    msg["pose"] = pose;
+    message["msg"] = msg;
+
+    QJsonDocument doc(message);
+    QString jsonMsg = QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
+
     qDebug() << "Goal Sent:" << jsonMsg;
 
     sendMessage(jsonMsg);

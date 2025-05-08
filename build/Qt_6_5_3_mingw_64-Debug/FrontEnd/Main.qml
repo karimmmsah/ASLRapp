@@ -8,10 +8,17 @@ import QtMultimedia
 // Main
 Window {
     id: main
-    visible: true
+    visible: false
     visibility: Window.FullScreen
     title: qsTr("ASLR Control Panel")
     color: "#ffffff"
+
+    // Cursor
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.ArrowCursor
+    }
 
     // Splash Screen
     property bool splashDone: false
@@ -190,6 +197,7 @@ Window {
                 text: "Connect"
                 width: 150
                 height: 50
+                focus: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: 22
@@ -208,9 +216,17 @@ Window {
                     text: rosConnector.isConnected ? "CONNECTED" : "CONNECT"
                 }
 
-                onClicked: {
-                    rosConnector.connectToRos();
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        rosConnector.connectToRos();
+                    }
                 }
+
+                Keys.onReturnPressed: rosConnector.connectToRos()
+                Keys.onEnterPressed: rosConnector.connectToRos()
 
                 Connections {
                     target: rosConnector
@@ -251,7 +267,12 @@ Window {
                     anchors.fill: parent
                 }
 
-                onClicked: exitDialog.open()
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: exitDialog.open()
+                }
             }
 
             // Exit Confirmation Dialog
@@ -294,7 +315,12 @@ Window {
                                 color: "#E0E0E0"
                                 radius: 10
                             }
-                            onClicked: exitDialog.close()
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: exitDialog.close()
+                            }
                         }
 
                         Button {
@@ -312,9 +338,14 @@ Window {
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
-                            onClicked:{
-                                main.close()
-                                console.log("App Terminated.")
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked:{
+                                    main.close()
+                                    console.log("App Terminated.")
+                                }
                             }
                         }
                     }
@@ -463,6 +494,14 @@ Window {
                         radius: 20
                     }
                 }
+                Keys.onReturnPressed: {
+                    if (emailField.text === "" || passwordField.text === "") {
+                        loginerrorDialog.open();
+                        okButton.focus = true;
+                    } else {
+                        authManager.loginUser(emailField.text, passwordField.text);
+                    }
+                }
             }
 
             // Password Field
@@ -490,9 +529,13 @@ Window {
                         color: "transparent"
                         radius: 20
                     }
-
-                    Keys.onReturnPressed: {
-                        loginButton.clicked()
+                }
+                Keys.onReturnPressed: {
+                    if (emailField.text === "" || passwordField.text === "") {
+                        loginerrorDialog.open();
+                        okButton.focus = true;
+                    } else {
+                        authManager.loginUser(emailField.text, passwordField.text);
                     }
                 }
             }
@@ -520,11 +563,17 @@ Window {
                     color: "white"
                 }
 
-                onClicked: {
-                    if (emailField.text === "" || passwordField.text === "") {
-                        loginerrorDialog.open();
-                    } else {
-                        authManager.loginUser(emailField.text, passwordField.text);
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (emailField.text === "" || passwordField.text === "") {
+                            loginerrorDialog.open();
+                            okButton.focus = true;
+                        } else {
+                            authManager.loginUser(emailField.text, passwordField.text);
+                        }
                     }
                 }
             }
@@ -541,6 +590,7 @@ Window {
 
             onLoginFailed: (errorMessage) => {
                                loginerrorDialog.open();
+                               okButton.focus = true;
                            }
         }
 
@@ -580,9 +630,11 @@ Window {
                     anchors.topMargin: 50
 
                     Button {
+                        id: okButton
                         text: "OK"
                         width: 80
                         height: 40
+                        focus: true
                         background: Rectangle {
                             color: "#008080"
                             radius: 10
@@ -595,7 +647,16 @@ Window {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                        onClicked: {
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                loginerrorDialog.close();
+                                emailField.focus = true;
+                            }
+                        }
+                        Keys.onReturnPressed: {
                             loginerrorDialog.close();
                             emailField.focus = true;
                         }
@@ -633,9 +694,14 @@ Window {
                 anchors.centerIn: parent
             }
 
-            onClicked: {
-                loginPage.visible = false
-                connectPage.visible = true
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    loginPage.visible = false
+                    connectPage.visible = true
+                }
             }
         }
     }
@@ -760,7 +826,7 @@ Window {
 
                 Rectangle {
                     id: controlToggle
-                    width: 310
+                    width: 320
                     height: 60
                     radius: 30
                     color: "#DBE2E9"
@@ -775,18 +841,23 @@ Window {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: controlToggle.radius
-                            color: controlToggle.isAutomatic ? "#2196F3" : "#DBE2E9"
+                            color: autonomousMouseArea.containsMouse ? "#2196F3"
+                                                                     : "#DBE2E9"
+
 
                             Text {
                                 text: "AUTONOMOUS"
                                 font.pixelSize: 18
                                 font.bold: true
-                                color: controlToggle.isAutomatic ? "white" : "black"
+                                color: autonomousMouseArea.containsMouse ? "white" : "black"
                                 anchors.centerIn: parent
                             }
 
                             MouseArea {
+                                id: autonomousMouseArea
                                 anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     controlToggle.isAutomatic = true
                                     selectionPage.visible = false
@@ -799,18 +870,22 @@ Window {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: controlToggle.radius
-                            color: controlToggle.isAutomatic ? "#DBE2E9" : "#2196F3"
+                            color: manualMouseArea.containsMouse ? "#2196F3"
+                                                                 : "#DBE2E9"
 
                             Text {
                                 text: "MANUAL"
                                 font.pixelSize: 18
                                 font.bold: true
-                                color: controlToggle.isAutomatic ? "black" : "white"
+                                color: manualMouseArea.containsMouse ? "white" : "black"
                                 anchors.centerIn: parent
                             }
 
                             MouseArea {
+                                id: manualMouseArea
                                 anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     controlToggle.isAutomatic = false
                                     selectionPage.visible = false
@@ -852,12 +927,17 @@ Window {
                 anchors.centerIn: parent
             }
 
-            onClicked: {
-                selectionPage.visible = false
-                loginPage.visible = true
-                emailField.text = ""
-                passwordField.text = ""
-                console.log("Signed out.")
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    selectionPage.visible = false
+                    loginPage.visible = true
+                    emailField.text = ""
+                    passwordField.text = ""
+                    console.log("Signed out.")
+                }
             }
         }
     }
@@ -866,7 +946,7 @@ Window {
     Item {
         id: automaticControlPage
         anchors.fill: parent
-        visible: false
+        visible: true
 
         // Time & Date Display
         Item {
@@ -1000,7 +1080,7 @@ Window {
         }
         Rectangle {
             x: 0
-            y: 170
+            y: 160
             width: 266
             height: 55
             opacity: 0.7
@@ -1017,7 +1097,7 @@ Window {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.leftMargin: 108
-            anchors.topMargin: 177
+            anchors.topMargin: 167
             font.pixelSize: 24
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -1162,20 +1242,7 @@ Window {
             }
         }
 
-        // Pick, Drop, QR Scan
-        ListModel {
-            id: shelfModel
-            ListElement { name: "Shelf A" }
-            ListElement { name: "Shelf B" }
-            ListElement { name: "Shelf C" }
-        }
-        ListModel {
-            id: locationModel
-            ListElement { name: "Location 1" }
-            ListElement { name: "Location 2" }
-            ListElement { name: "Location 3" }
-        }
-
+        // Pick & Drop
         Column {
             anchors.top: parent.top
             anchors.right: parent.right
@@ -1183,12 +1250,22 @@ Window {
             anchors.rightMargin: 80
             spacing: 30
 
-            // Pick Section
+            property var goalCoordinates: {
+                "Shelf A": { x: 8.47661 , y: 0.073312 },
+                "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                "Shelf C": { x: 2.51197 , y: -4.50967 },
+                "Shelf D": { x: 2.51197 , y:  -1.16554 },
+                "Location 1": { x: 10.8946 , y: -2.29781 },
+                "Location 2": { x: 13.2928 , y: -5.59084 },
+                "Location 3": { x: 10.8946 , y: -6.70115 },
+            }
+
+            // Pick
             Column {
                 spacing: 10
 
                 Label {
-                    text: "START"
+                    text: "SHELVES"
                     font.pointSize: 16
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
@@ -1198,33 +1275,43 @@ Window {
 
                 ComboBox {
                     id: shelfDropdown
-                    width: 180
+                    width: 200
                     height: 40
-                    model: shelfModel
-                    textRole: "name"
+                    model: ["", "Shelf A", "Shelf B", "Shelf C" , "Shelf D"]
+                    currentIndex: -1
 
                     background: Rectangle {
-                        color: "#343434"
+                        color: "#DBE2E9"
                         radius: 8
                     }
 
                     contentItem: Text {
-                        text: shelfDropdown.currentText
-                        color: "white"
-                        font.family: "Tahoma"
+                        text: shelfDropdown.currentText || "Select a Shelf"
+                        color: "black"
                         font.pointSize: 14
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                     }
+
+                    indicator: Rectangle {
+                        width: 5
+                        height: 5
+                        radius: 5
+                        color: "black"
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
+                    }
                 }
             }
 
-            // Drop Section
+            // Drop
             Column {
                 spacing: 10
 
                 Label {
-                    text: "END"
+                    text: "LOCATIONS"
                     font.pointSize: 16
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
@@ -1236,21 +1323,215 @@ Window {
                     id: locationDropdown
                     width: 180
                     height: 40
-                    model: locationModel
-                    textRole: "name"
+                    model: ["", "Location 1", "Location 2", "Location 3"]
 
                     background: Rectangle {
-                        color: "#343434"
+                        color: "#DBE2E9"
                         radius: 8
                     }
 
                     contentItem: Text {
-                        text: locationDropdown.currentText
-                        color: "white"
-                        font.family: "Tahoma"
+                        text: locationDropdown.currentText || "Select a Location"
+                        color: "black"
                         font.pointSize: 14
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    indicator: Rectangle {
+                        width: 5
+                        height: 5
+                        radius: 5
+                        color: "black"
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
+                    }
+                }
+            }
+        }
+
+        // Send Start Goal
+        Button {
+            text: "PICK"
+            width: 180
+            height: 40
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenterOffset: -300
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 30
+            font.bold: true
+            font.pointSize: 14
+
+            background: Rectangle {
+                color: "#2bd91b"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 22
+                font.bold: true
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Tahoma"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                property var goalCoordinates: {
+                    "Shelf A": { x: 8.47661 , y: 0.073312 },
+                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf C": { x: 2.51197 , y: -4.50967 },
+                    "Shelf D": { x: 2.51197 , y:  -1.16554 },
+                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 2": { x: 13.2928 , y: -5.59084 },
+                    "Location 3": { x: 10.8946 , y: -6.70115 },
+                }
+                onClicked: {
+                    console.log("Selected Shelf: " + shelfDropdown.currentText);
+                    console.log("Selected Location: " + locationDropdown.currentText);
+
+                    var shelf = shelfDropdown.currentText;
+                    var goal = goalCoordinates[shelf];
+
+                    if (goal) {
+                        console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
+                        rosConnector.sendGoal(goal.x, goal.y);
+                    } else {
+                        console.warn("Invalid goal selected!");
+                    }
+                }
+            }
+        }
+
+        // Send End Goal
+        Button {
+            text: "DROP"
+            width: 180
+            height: 40
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenterOffset: +50
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 30
+            font.bold: true
+            font.pointSize: 14
+
+            background: Rectangle {
+                color: "#2bd91b"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 22
+                font.bold: true
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Tahoma"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                property var goalCoordinates: {
+                    "Shelf A": { x: 8.47661 , y: 0.073312 },
+                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf C": { x: 2.51197 , y: -4.50967 },
+                    "Shelf D": { x: 2.51197 , y:  -1.16554 },
+                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 2": { x: 13.2928 , y: -5.59084 },
+                    "Location 3": { x: 10.8946 , y: -6.70115 },
+                }
+                onClicked: {
+                    console.log("Selected Shelf: " + shelfDropdown.currentText);
+                    console.log("Selected Location: " + locationDropdown.currentText);
+
+                    var location = locationDropdown.currentText;
+                    var goal = goalCoordinates[location];
+
+                    if (goal) {
+                        console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
+                        rosConnector.sendGoal(goal.x, goal.y);
+                    } else {
+                        console.warn("Invalid goal selected!");
+                    }
+                }
+            }
+        }
+
+        // Unified Pick & Drop Button
+        Button {
+            text: "EXECUTE"
+            width: 180
+            height: 40
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 120
+            font.bold: true
+            font.pointSize: 16
+
+            background: Rectangle {
+                color: "#2bd91b"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 22
+                font.bold: true
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Tahoma"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                property var goalCoordinates: {
+                    "Shelf A": { x: 8.47661 , y: 0.073312 },
+                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf C": { x: 2.51197 , y: -4.50967 },
+                    "Shelf D": { x: 2.51197 , y:  -1.16554 },
+                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 2": { x: 13.2928 , y: -5.59084 },
+                    "Location 3": { x: 10.8946 , y: -6.70115 }
+                }
+
+                onClicked: {
+                    if (shelfDropdown.currentText && locationDropdown.currentText) {
+                        var shelf = shelfDropdown.currentText;
+                        var shelfGoal = goalCoordinates[shelf];
+                        console.log("Selected Shelf: " + shelf);
+
+                        if (shelfGoal) {
+                            console.log("Sending shelf goal: x=" + shelfGoal.x + " y=" + shelfGoal.y);
+                            rosConnector.sendGoal(shelfGoal.x, shelfGoal.y);
+                            rosConnector.goalReached.connect(function() {
+                                var location = locationDropdown.currentText;
+                                var locationGoal = goalCoordinates[location];
+                                console.log("Selected Location: " + location);
+
+                                if (locationGoal) {
+                                    console.log("Sending location goal: x=" + locationGoal.x + " y=" + locationGoal.y);
+                                    rosConnector.sendGoal(locationGoal.x, locationGoal.y);
+                                } else {
+                                    console.warn("Invalid location selected!");
+                                }
+                            });
+                        } else {
+                            console.warn("Invalid shelf selected!");
+                        }
+                    } else {
+                        console.warn("Please select both a shelf and a location!");
                     }
                 }
             }
@@ -1322,1080 +1603,1183 @@ Window {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                onClicked: {
-                    qrScanner.cameraVisible = !qrScanner.cameraVisible;
-                }
-            }
-        }
-
-    // Emergency Button
-    Button {
-        text: "Emergency Stop"
-        width: 160
-        height: 60
-        font.bold: true
-        font.pointSize: 13
-        font.family: "Tahoma"
-
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.rightMargin: 90
-        anchors.topMargin: 540
-
-        background: Rectangle {
-            color: "red";
-            radius: 10
-        }
-
-        contentItem: Text {
-            text: "Emergency Stop"
-            font.bold: true
-            font.pointSize: 12
-            font.family: "Tahoma"
-            color: "white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-
-        onClicked: console.log("Emergency Stop Triggered!") &
-                   rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
-                   rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
-    }
-
-    // Execute Button
-    Button {
-        text: "EXECUTE"
-        width: 180
-        height: 40
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: 120
-        font.bold: true
-        font.pointSize: 16
-
-        background: Rectangle {
-            color: "#33dc23"
-            radius: 10
-        }
-
-        contentItem: Text {
-            text: parent.text
-            font.pixelSize: 22
-            font.bold: true
-            color: "white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.family: "Tahoma"
-        }
-
-        onClicked: {
-            console.log("Selected Shelf: " + shelfDropdown.currentText)
-            console.log("Selected Location: " + locationDropdown.currentText)
-        }
-    }
-
-    // Digital Twin
-    Row {
-        id: cameraMapRow
-        property real mapScale: 100
-        property real mapWidth: digitalTwinMap.width
-        property real mapHeight: digitalTwinMap.height
-
-        // Robot position and rotation
-        property real robotX: mapWidth / 2 - 12.5 - 40
-        property real robotY: mapHeight / 2 - 12.5 - 10
-        property real robotRotation: 0
-
-        // AMCL origin for relative positioning
-        property real originX: undefined
-        property real originY: undefined
-
-        // Coordinate conversion from meters to pixels
-        function metersToPixelsX(x) {
-            return (x - originX) * mapScale + mapWidth / 2;
-        }
-
-        function metersToPixelsY(y) {
-            return mapHeight / 2 - (y - originY) * mapScale;
-        }
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: 250
-        anchors.rightMargin: 50
-        spacing: 30
-
-        Rectangle {
-            id: digitalTwinMap
-            width: 600
-            height: 350
-            color: "#ffffff"
-
-            Image {
-                id: mapImage
-                anchors.fill: parent
-                source: "qrc:/Images/mapsmallwarehouse.png"
-            }
-
-            Canvas {
-                id: pathCanvas
-                anchors.fill: parent
-                property var globalPath: []
-
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = "blue";
-
-                    if (globalPath.length > 1) {
-                        ctx.beginPath();
-                        ctx.moveTo(globalPath[0].x, globalPath[0].y);
-                        for (var i = 1; i < globalPath.length; i++) {
-                            ctx.lineTo(globalPath[i].x, globalPath[i].y);
-                        }
-                        ctx.stroke();
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        qrScanner.cameraVisible = !qrScanner.cameraVisible;
                     }
                 }
             }
-
-            // Robot Icon
-            Image {
-                id: robotIcon
-                source: "qrc:/Images/LiftRobot.png"
-                width: 40
-                height: 40
-                x: cameraMapRow.robotX
-                y: cameraMapRow.robotY
-                rotation: cameraMapRow.robotRotation
-                transformOrigin: Item.Center
-                smooth: true
-                antialiasing: true
-            }
         }
 
-        NumberAnimation on robotX {
-            id: robotIconNumberAnimationX
-            duration: 200
-        }
-
-        NumberAnimation on robotY {
-            id: robotIconNumberAnimationY
-            duration: 200
-        }
-
-        Connections {
-            target: rosConnector
-
-            function onPoseReceived(json) {
-                var pose = JSON.parse(json);
-                var x = pose.position.x;
-                var y = pose.position.y;
-                var q = pose.orientation;
-
-                console.log("Received Robot Position -> X:", x, "Y:", y);
-
-                if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
-                    cameraMapRow.originX = x;
-                    cameraMapRow.originY = y;
-                    console.log("Origin set to:", x, y);
-                }
-
-                cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
-                cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
-                cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
-            }
-
-            function onGlobalPathReceived(json) {
-                var arr = JSON.parse(json);
-
-                if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
-                    console.log("Skipping path drawing until origin is known.");
-                    return;
-                }
-
-                pathCanvas.globalPath = arr.map(p => ({
-                                                          x: cameraMapRow.metersToPixelsX(p.pose.position.x),
-                                                          y: cameraMapRow.metersToPixelsY(p.pose.position.y)
-                                                      }));
-                pathCanvas.requestPaint();
-            }
-        }
-    }
-
-    // Back Button
-    Button {
-        text: "Back"
-        width: 80
-        height: 40
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: 20
-        anchors.bottomMargin: 20
-        font.bold: false
-        font.pointSize: 10
-        font.family: "Tahoma"
-        display: AbstractButton.TextOnly
-
-        background: Rectangle {
-            color: "#D32F2F"
-            radius: 10
-        }
-
-        contentItem: Text {
-            text: parent.text
-            font.pixelSize: 18
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+        // Emergency Button
+        Button {
+            text: "Emergency Stop"
+            width: 160
+            height: 60
             font.bold: true
-            color: "white"
-            anchors.centerIn: parent
-        }
+            font.pointSize: 13
+            font.family: "Tahoma"
 
-        onClicked: {
-            automaticControlPage.visible = false
-            selectionPage.visible = true
-        }
-    }
-}
-//--------------------------------------------------------------
-// Manual Control
-Item {
-    id: manualControlPage
-    visible: false
-    anchors.fill: parent
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 90
+            anchors.topMargin: 540
 
-    // Time & Date Display
-    Item {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: 20
-        anchors.rightMargin: 20
+            background: Rectangle {
+                color: "red";
+                radius: 10
+            }
 
-        property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
-        property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
+            contentItem: Text {
+                text: "Emergency Stop"
+                font.bold: true
+                font.pointSize: 12
+                font.family: "Tahoma"
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
 
-        Timer {
-            interval: 1000
-            running: true
-            repeat: true
-            onTriggered: {
-                timeDateContainer.currentTime = Qt.formatTime(new Date(), "hh:mm:ss ap")
-                timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: console.log("Emergency Stop Triggered!") &
+                           rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                           rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
             }
         }
 
-        Rectangle {
-            x: -195
-            y: 0
-            width: 250
-            height: 70
-            color: "#ffffff"
-
-            Column {
-                anchors.centerIn: parent
-                spacing: 2
-
-                Text {
-                    text: timeDateContainer.currentDate
-                    font.pixelSize: 16
-                    font.bold: true
-                    color: "#333333"
-                }
-
-                Text {
-                    text: timeDateContainer.currentTime
-                    font.pixelSize: 20
-                    font.bold: true
-                    color: "#222222"
-                }
-            }
-        }
-    }
-
-    // Title
-    Text {
-        x: 240
-        y: 640
-        width: 615
-        height: 60
-        text: "Manual Drive Mode"
-        elide: Text.ElideNone
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.rightMargin: -54
-        anchors.bottomMargin: 0
-        font.pixelSize: 42
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        wrapMode: Text.WordWrap
-        font.hintingPreference: Font.PreferDefaultHinting
-        styleColor: "#423ea3"
-        style: Text.Sunken
-        font.capitalization: Font.AllUppercase
-        textFormat: Text.AutoText
-        font.italic: false
-        font.weight: Font.Bold
-        font.family: "Tahoma"
-        font.bold: true
-        color: "#000000"
-    }
-    // Logo Image
-    Image {
-        width: 315
-        height: 315
-        opacity: 1
-        visible: true
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.leftMargin: -35
-        anchors.topMargin: -70
-        source: "qrc:/Images/Logo.png"
-        clip: false
-        fillMode: Image.PreserveAspectFit
-        z:1
-    }
-    // Decorations
-    Rectangle {
-        x: 856
-        width: 2000
-        height: 60
-        opacity: 0.9
-        color: "#18C519"
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.rightMargin: -2
-        anchors.topMargin: 760
-        z: -22
-    }
-    Rectangle {
-        x: 1100
-        y: 100
-        width: 266
-        height: 56
-        opacity: 0.7
-        color: "#525ed4"
-        z: -22
-    }
-    Text {
-        x: 1142
-        width: 90
-        height: 40
-        color: "#f8f9fA"
-        text: qsTr("Robot Control")
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.rightMargin: 120
-        anchors.topMargin: 108
-        font.pixelSize: 24
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        layer.enabled: false
-        font.styleName: "Bold"
-        font.bold: true
-        font.family: "Tahoma"
-    }
-    Rectangle {
-        x: 1100
-        y: 470
-        width: 266
-        height: 56
-        opacity: 0.7
-        color: "#525ed4"
-        z: -22
-    }
-    Text {
-        x: 1188
-        width: 90
-        height: 40
-        color: "#f8f9fA"
-        text: qsTr("Mechanism Control")
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.rightMargin: 88
-        anchors.topMargin: 478
-        font.pixelSize: 24
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.styleName: "Bold"
-        font.family: "Tahoma"
-        font.bold: true
-    }
-    Rectangle {
-        x: 0
-        y: 170
-        width: 266
-        height: 55
-        opacity: 0.7
-        color: "#525ed4"
-        z: 22
-    }
-    Text {
-        x: 2
-        z: 23
-        width: 90
-        height: 40
-        color: "#f8f9fA"
-        text: qsTr("Warehouse Map")
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.leftMargin: 108
-        anchors.topMargin: 177
-        font.pixelSize: 24
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        layer.enabled: false
-        font.styleName: "Bold"
-        font.bold: true
-        font.family: "Tahoma"
-    }
-
-    // Status & Battery Display
-    Column {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: 20
-        spacing: 10
-
-        //  Status Display
+        // Digital Twin
         Row {
-            spacing: 5
+            id: cameraMapRow
+            property real mapScalex: 59
+            property real mapScaley: 48
+            property real mapWidth: digitalTwinMap.width
+            property real mapHeight: digitalTwinMap.height
+
+            // Initial pixel anchor
+            property real initialPixelX: 50
+            property real initialPixelY: 90
+
+            // Dynamic robot pose in pixels
+            property real robotX: initialPixelX
+            property real robotY: initialPixelY
+            property real robotRotation: 0
+
+            // AMCL origin to align ROS coordinates with pixel space
+            property real originX: undefined
+            property real originY: undefined
+
+            // Convert from ROS meters to pixels
+            function metersToPixelsX(x) {
+                return (x - originX) * mapScalex + initialPixelX;
+            }
+
+            function metersToPixelsY(y) {
+                return initialPixelY - (y - originY) * mapScaley;
+            }
+
             anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 220
+            anchors.rightMargin: 100
+            spacing: 30
 
-            Label {
-                text: "Status:"
-                font.pointSize: 16
-                font.bold: true
-                color: "black"
+            Rectangle {
+                id: digitalTwinMap
+                width: 900
+                height: 450
+                color: "#f0f0f0"
+
+                Image {
+                    id: mapImage
+                    anchors.fill: parent
+                    source: "qrc:/Images/map_with_shelves.png"
+                }
+
+                // Global path canvas
+                Canvas {
+                    id: pathCanvas
+                    anchors.fill: parent
+                    property var globalPath: []
+
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = "blue";
+
+                        if (globalPath.length > 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(globalPath[0].x, globalPath[0].y);
+                            for (var i = 1; i < globalPath.length; i++) {
+                                ctx.lineTo(globalPath[i].x, globalPath[i].y);
+                            }
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Robot Icon
+                Image {
+                    id: robotIcon
+                    source: "qrc:/Images/LiftRobot.png"
+                    width: 40
+                    height: 40
+                    x: cameraMapRow.robotX - width / 2
+                    y: cameraMapRow.robotY - height / 2
+                    rotation: cameraMapRow.robotRotation
+                    transformOrigin: Item.Center
+                    smooth: true
+                    antialiasing: true
+                }
+
+                // Goal marker
+                Image {
+                    id: goalMarker
+                    source: "qrc:/Images/flag.png"
+                    width: 40
+                    height: 40
+                    visible: false
+                    z: 10
+                    smooth: true
+                    antialiasing: true
+                }
             }
 
-            Label {
-                id: mstatusLabel
-                text: "Idle"
-                font.pointSize: 16
-                font.bold: true
-                color: "orange"
-            }
+            NumberAnimation on robotX { duration: 5 }
+            NumberAnimation on robotY { duration: 5 }
 
             Connections {
                 target: rosConnector
 
-                onMessageReceived: function(message) {
-                    try {
-                        let data = JSON.parse(message);
-                        console.log("Received message for status:", data);
-                        if (data.topic === "/hoverboard/connected") {
-                            let status = data.msg.data;
-                            updateStatus(status);
-                        }
-                    } catch (e) {
-                        console.error("Error parsing message:", e);
-                    }
-                }
-            }
+                function onPoseReceived(json) {
+                    var pose = JSON.parse(json);
+                    var x = pose.position.x;
+                    var y = pose.position.y;
+                    var q = pose.orientation;
 
-            function updateStatus(status) {
-                console.log("Status update:", status);
-                if (status === false) {
-                    mstatusLabel.text = "Idle";
-                    mstatusLabel.color = "orange";
-                } else if (status === true) {
-                    mstatusLabel.text = "Busy";
-                    mstatusLabel.color = "red";
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                        cameraMapRow.originX = x;
+                        cameraMapRow.originY = y;
+                        console.log("Origin set to:", x, y);
+                    }
+
+                    cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
+                    cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
+                    cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                }
+
+                function onGlobalPathReceived(json) {
+                    var arr = JSON.parse(json);
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                        console.log("Skipping path drawing until origin is known.");
+                        return;
+                    }
+
+                    pathCanvas.globalPath = arr.map(p => ({
+                                                              x: cameraMapRow.metersToPixelsX(p.pose.position.x),
+                                                              y: cameraMapRow.metersToPixelsY(p.pose.position.y)
+                                                          }));
+                    pathCanvas.requestPaint();
+                }
+
+                function onGoalReceived(json) {
+                    var goal = JSON.parse(json);
+                    var x = goal.position.x;
+                    var y = goal.position.y;
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined)
+                        return;
+
+                    var pixelX = cameraMapRow.metersToPixelsX(x);
+                    var pixelY = cameraMapRow.metersToPixelsY(y);
+
+                    goalMarker.visible = true;
+                    goalMarker.x = pixelX - goalMarker.width / 2;
+                    goalMarker.y = pixelY - goalMarker.height / 2;
+
+                    console.log("Goal marker placed at:", pixelX, pixelY);
                 }
             }
         }
 
-        // Battery Level Display
-        Column {
-            spacing: 5
-            anchors.horizontalCenter: parent.horizontalCenter
+        // Back Button
+        Button {
+            text: "Back"
+            width: 80
+            height: 40
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 20
+            anchors.bottomMargin: 20
+            font.bold: false
+            font.pointSize: 10
+            font.family: "Tahoma"
+            display: AbstractButton.TextOnly
 
+            background: Rectangle {
+                color: "#D32F2F"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 18
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.bold: true
+                color: "white"
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    automaticControlPage.visible = false
+                    selectionPage.visible = true
+                }
+            }
+        }
+    }
+    //--------------------------------------------------------------
+    // Manual Control
+    Item {
+        id: manualControlPage
+        visible: false
+        anchors.fill: parent
+
+        // Time & Date Display
+        Item {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 20
+            anchors.rightMargin: 20
+
+            property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
+            property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
+
+            Timer {
+                interval: 1000
+                running: true
+                repeat: true
+                onTriggered: {
+                    timeDateContainer.currentTime = Qt.formatTime(new Date(), "hh:mm:ss ap")
+                    timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
+                }
+            }
+
+            Rectangle {
+                x: -195
+                y: 0
+                width: 250
+                height: 70
+                color: "#ffffff"
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Text {
+                        text: timeDateContainer.currentDate
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "#333333"
+                    }
+
+                    Text {
+                        text: timeDateContainer.currentTime
+                        font.pixelSize: 20
+                        font.bold: true
+                        color: "#222222"
+                    }
+                }
+            }
+        }
+
+        // Title
+        Text {
+            x: 240
+            y: 640
+            width: 615
+            height: 60
+            text: "Manual Drive Mode"
+            elide: Text.ElideNone
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: -54
+            anchors.bottomMargin: 0
+            font.pixelSize: 42
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.WordWrap
+            font.hintingPreference: Font.PreferDefaultHinting
+            styleColor: "#423ea3"
+            style: Text.Sunken
+            font.capitalization: Font.AllUppercase
+            textFormat: Text.AutoText
+            font.italic: false
+            font.weight: Font.Bold
+            font.family: "Tahoma"
+            font.bold: true
+            color: "#000000"
+        }
+        // Logo Image
+        Image {
+            width: 315
+            height: 315
+            opacity: 1
+            visible: true
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.leftMargin: -35
+            anchors.topMargin: -70
+            source: "qrc:/Images/Logo.png"
+            clip: false
+            fillMode: Image.PreserveAspectFit
+            z:1
+        }
+        // Decorations
+        Rectangle {
+            x: 856
+            width: 2000
+            height: 60
+            opacity: 0.9
+            color: "#18C519"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: -2
+            anchors.topMargin: 760
+            z: -22
+        }
+        Rectangle {
+            x: 1100
+            y: 100
+            width: 266
+            height: 56
+            opacity: 0.7
+            color: "#525ed4"
+            z: -22
+        }
+        Text {
+            x: 1142
+            width: 90
+            height: 40
+            color: "#f8f9fA"
+            text: qsTr("Robot Control")
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 120
+            anchors.topMargin: 108
+            font.pixelSize: 24
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            layer.enabled: false
+            font.styleName: "Bold"
+            font.bold: true
+            font.family: "Tahoma"
+        }
+        Rectangle {
+            x: 1100
+            y: 470
+            width: 266
+            height: 56
+            opacity: 0.7
+            color: "#525ed4"
+            z: -22
+        }
+        Text {
+            x: 1188
+            width: 90
+            height: 40
+            color: "#f8f9fA"
+            text: qsTr("Mechanism Control")
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 88
+            anchors.topMargin: 478
+            font.pixelSize: 24
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.styleName: "Bold"
+            font.family: "Tahoma"
+            font.bold: true
+        }
+        Rectangle {
+            x: 0
+            y: 160
+            width: 266
+            height: 55
+            opacity: 0.7
+            color: "#525ed4"
+            z: 22
+        }
+        Text {
+            x: 2
+            z: 23
+            width: 90
+            height: 40
+            color: "#f8f9fA"
+            text: qsTr("Warehouse Map")
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.leftMargin: 108
+            anchors.topMargin: 167
+            font.pixelSize: 24
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            layer.enabled: false
+            font.styleName: "Bold"
+            font.bold: true
+            font.family: "Tahoma"
+        }
+
+        // Status & Battery Display
+        Column {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 20
+            spacing: 10
+
+            //  Status Display
             Row {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 Label {
-                    text: "Battery:"
-                    font.pointSize: 14
+                    text: "Status:"
+                    font.pointSize: 16
                     font.bold: true
                     color: "black"
                 }
 
                 Label {
-                    id: mbatteryPercentage
-                    text: " 0%"
-                    font.pointSize: 14
+                    id: mstatusLabel
+                    text: "Idle"
+                    font.pointSize: 16
                     font.bold: true
+                    color: "orange"
                 }
 
-                Timer {
-                    id: mbatterySubscribeTimer
-                    interval: 1000
-                    running: true
-                    repeat: true
-                }
                 Connections {
                     target: rosConnector
 
                     onMessageReceived: function(message) {
                         try {
                             let data = JSON.parse(message);
-                            console.log("Received battery message:", data);
-                            if (data.topic === "/hoverboard/battery_voltage") {
-                                let voltage = data.msg.data
-
-                                let percentage = ((voltage - 33) / (42 - 33)) * 100
-                                percentage = Math.min(100, Math.max(0, percentage))
-
-                                mbatteryPercentage.text = Math.round(percentage) + "%"
-                                mbatteryBar.width = 200 * (percentage / 100)
-
-                                if (percentage > 60) {
-                                    mbatteryPercentage.color = "green"
-                                    mbatteryBar.color = "green"
-                                } else if (percentage > 30) {
-                                    mbatteryPercentage.color = "orange"
-                                    mbatteryBar.color = "orange"
-                                } else {
-                                    mbatteryPercentage.color = "red"
-                                    mbatteryBar.color = "red"
-                                }
+                            console.log("Received message for status:", data);
+                            if (data.topic === "/hoverboard/connected") {
+                                let status = data.msg.data;
+                                updateStatus(status);
                             }
                         } catch (e) {
-                            console.log("Battery message parse error:", e)
+                            console.error("Error parsing message:", e);
                         }
                     }
                 }
-            }
 
-            Rectangle {
-                width: 200
-                height: 15
-                radius: 5
-                color: "#E0E0E0"
-
-                Rectangle {
-                    id: mbatteryBar
-                    height: parent.height
-                    radius: 5
+                function updateStatus(status) {
+                    console.log("Status update:", status);
+                    if (status === false) {
+                        mstatusLabel.text = "Idle";
+                        mstatusLabel.color = "orange";
+                    } else if (status === true) {
+                        mstatusLabel.text = "Busy";
+                        mstatusLabel.color = "red";
+                    }
                 }
             }
 
-            // Charge Button
-            Button {
-                id: chargeButton
-                text: "CHARGE"
-                focusPolicy: Qt.NoFocus
-                width: 90
-                height: 40
+            // Battery Level Display
+            Column {
+                spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.bold: true
-                font.pointSize: 14
-                font.family: "Tahoma"
 
-                background: Rectangle {
-                    color: "orange"
-                    radius: 10
-                }
+                Row {
+                    spacing: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
 
-                contentItem: Text {
-                    text: parent.text
-                    font.pixelSize: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.bold: true
-                    color: "white"
-                }
-
-                onClicked: {
-                    console.log("Heading to charging station.")
-                    rosConnector.goToChargingStation()
-                }
-            }
-        }
-    }
-
-    // Robot Movement
-    Item {
-        id: controlPanel
-        width: parent.width
-        height: parent.height
-
-        property int buttonSize: 70
-        property int stopSize: 70
-        property int spacing: 15
-
-        FocusScope {
-            id: keyHandler
-            focus: true
-
-            onVisibleChanged: {
-                if (manualControlPage.visible === true) keyHandler.forceActiveFocus();
-            }
-
-            Keys.onPressed: (event) => {
-                                event.accepted = true;
-
-                                switch (event.key) {
-                                    case 16777235: // Numpad 8
-                                    console.log("Move Forward");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                    break;
-                                    case 16777237: // Numpad 2
-                                    console.log("Move Backward");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                    break;
-                                    case 16777234: // Numpad 4
-                                    console.log("Move Left");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                    break;
-                                    case 16777236: // Numpad 6
-                                    console.log("Move Right");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                    break;
-                                    case 16777233: // Numpad 7
-                                    console.log("Move North-West");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                    break;
-                                    case 16777239: // Numpad 9
-                                    console.log("Move North-East");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                    break;
-                                    case 16777232: // Numpad 1
-                                    console.log("Move South-West");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                    break;
-                                    case 16777238: // Numpad 3
-                                    console.log("Move South-East");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                    break;
-                                    case 16777227: // Numpad 5
-                                    console.log("STOP");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                    break;
-                                    case Qt.Key_A: // A key for Ascend
-                                    console.log("Lift Ascend");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
-                                    break;
-                                    case Qt.Key_D: // D key for Descend
-                                    console.log("Lift Descend");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
-                                    break;
-                                    case Qt.Key_X: // X key for Lift Stop
-                                    console.log("Lift Stop");
-                                    rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"x"}}');
-                                    break;
-                                    default:
-                                    console.log("Unknown Key:", event.key);
-                                }
-                            }
-        }
-
-        Column {
-            id: movementGrid
-            spacing: controlPanel.spacing
-
-            // Row 1: NW, UP, NE
-            Row {
-                spacing: controlPanel.spacing
-                Button {
-                    text: "↖"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move North-West") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-
-                Button {
-                    text: "↑"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move Forward") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-
-                Button {
-                    text: "↗"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move North-East") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-            }
-
-            // Row 2: LEFT, STOP, RIGHT
-            Row {
-                spacing: controlPanel.spacing
-                Button {
-                    text: "←"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move Left") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-
-                Button {
-                    text: "STOP"
-                    width: controlPanel.stopSize
-                    height: controlPanel.stopSize
-                    font.pointSize: 16
-                    onClicked: {
-                        console.log("STOP")
-                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
-                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                    Label {
+                        text: "Battery:"
+                        font.pointSize: 14
+                        font.bold: true
+                        color: "black"
                     }
 
+                    Label {
+                        id: mbatteryPercentage
+                        text: " 0%"
+                        font.pointSize: 14
+                        font.bold: true
+                    }
+
+                    Timer {
+                        id: mbatterySubscribeTimer
+                        interval: 1000
+                        running: true
+                        repeat: true
+                    }
+                    Connections {
+                        target: rosConnector
+
+                        onMessageReceived: function(message) {
+                            try {
+                                let data = JSON.parse(message);
+                                console.log("Received battery message:", data);
+                                if (data.topic === "/hoverboard/battery_voltage") {
+                                    let voltage = data.msg.data
+
+                                    let percentage = ((voltage - 33) / (42 - 33)) * 100
+                                    percentage = Math.min(100, Math.max(0, percentage))
+
+                                    mbatteryPercentage.text = Math.round(percentage) + "%"
+                                    mbatteryBar.width = 200 * (percentage / 100)
+
+                                    if (percentage > 60) {
+                                        mbatteryPercentage.color = "green"
+                                        mbatteryBar.color = "green"
+                                    } else if (percentage > 30) {
+                                        mbatteryPercentage.color = "orange"
+                                        mbatteryBar.color = "orange"
+                                    } else {
+                                        mbatteryPercentage.color = "red"
+                                        mbatteryBar.color = "red"
+                                    }
+                                }
+                            } catch (e) {
+                                console.log("Battery message parse error:", e)
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 200
+                    height: 15
+                    radius: 5
+                    color: "#E0E0E0"
+
+                    Rectangle {
+                        id: mbatteryBar
+                        height: parent.height
+                        radius: 5
+                    }
+                }
+
+                // Charge Button
+                Button {
+                    id: chargeButton
+                    text: "CHARGE"
+                    focusPolicy: Qt.NoFocus
+                    width: 90
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.bold: true
+                    font.pointSize: 14
+                    font.family: "Tahoma"
+
                     background: Rectangle {
-                        color: "red"
+                        color: "orange"
                         radius: 10
                     }
 
                     contentItem: Text {
-                        text: "STOP"
-                        font.pointSize: 16
-                        color: "white"
-                        font.bold: true
+                        text: parent.text
+                        font.pixelSize: 16
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                        color: "white"
+                    }
+
+                    MouseArea {
                         anchors.fill: parent
-                    }
-                }
-
-                Button {
-                    text: "→"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move Right") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-            }
-
-            // Row 3: SW, DOWN, SE
-            Row {
-                spacing: controlPanel.spacing
-                Button {
-                    text: "↙"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move South-West") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-
-                Button {
-                    text: "↓"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move Backward") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-
-                Button {
-                    text: "↘"
-                    width: controlPanel.buttonSize
-                    height: controlPanel.buttonSize
-                    font.pointSize: 22
-                    onClicked: console.log("Move South-East") &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
-                               rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
-                    background: Rectangle { color: "#DBE2E9"; radius: 10 }
-                }
-            }
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 30
-            anchors.topMargin: 190
-        }
-    }
-
-    // Mechanism Control
-    Item {
-        id: mechanismControl
-        anchors.fill: parent
-
-        property int buttonWidth: 140
-        property int buttonHeight: 50
-        property int buttonRadius: 10
-
-        // Ascend Button
-        Button {
-            id: ascend
-            width: 100
-            text: "Ascend"
-            focusPolicy: Qt.NoFocus
-            height: mechanismControl.buttonHeight
-            font.pointSize: 16
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 160
-            anchors.topMargin: 550
-            font.bold: false
-            font.family: "Tahoma"
-            onClicked: {
-                console.log("Lift Ascend");
-                rosConnector.sendMessage(JSON.stringify({
-                                                            op: "publish",
-                                                            topic: "/linear_actuator_cmd",
-                                                            msg: {
-                                                                data: "0"
-                                                            }
-                                                        }));
-            }
-
-            background: Rectangle {
-                color: "#DBE2E9"
-                radius: mechanismControl.buttonRadius
-            }
-        }
-
-        // Descend Button
-        Button {
-            id: descend
-            width: 100
-            text: "Descend"
-            focusPolicy: Qt.NoFocus
-            height: mechanismControl.buttonHeight
-            font.pointSize: 16
-            anchors.left: parent.right
-            anchors.top: parent.top
-            anchors.leftMargin: -130
-            anchors.topMargin: 550
-            font.family: "Tahoma"
-            onClicked: {
-                console.log("Lift Descend");
-                rosConnector.sendMessage(JSON.stringify({
-                                                            op: "publish",
-                                                            topic: "/linear_actuator_cmd",
-                                                            msg: {
-                                                                data: "1"
-                                                            }
-                                                        }));
-            }
-
-            background: Rectangle {
-                color: "#DBE2E9"
-                radius: mechanismControl.buttonRadius
-            }
-        }
-        // Stop Button
-        Button {
-            id: stoplift
-            width: 100
-            text: "Stop"
-            focusPolicy: Qt.NoFocus
-            height: mechanismControl.buttonHeight
-            font.pointSize: 16
-            anchors.left: parent.right
-            anchors.top: parent.top
-            anchors.leftMargin: -200
-            anchors.topMargin: 620
-            font.family: "Tahoma"
-            onClicked: {
-                console.log("Lift Stop");
-                rosConnector.sendMessage(JSON.stringify({
-                                                            op: "publish",
-                                                            topic: "/linear_actuator_cmd",
-                                                            msg: {
-                                                                data: "x"
-                                                            }
-                                                        }));
-            }
-
-            background: Rectangle {
-                color: "#DBE2E9"
-                radius: mechanismControl.buttonRadius
-            }
-        }
-    }
-
-    // Digital Twin
-    Row {
-        property real mapScale: 100
-        property real mapWidth: digitalTwinMap.width
-        property real mapHeight: digitalTwinMap.height
-
-        // Robot position and rotation
-        property real robotX: mapWidth / 2 - 12.5 - 40
-        property real robotY: mapHeight / 2 - 12.5 - 10
-        property real robotRotation: 0
-
-        // AMCL origin for relative positioning
-        property real originX: undefined
-        property real originY: undefined
-
-        // Coordinate conversion from meters to pixels
-        function metersToPixelsX(x) {
-            return (x - originX) * mapScale + mapWidth / 2;
-        }
-
-        function metersToPixelsY(y) {
-            return mapHeight / 2 - (y - originY) * mapScale;
-        }
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: 250
-        anchors.rightMargin: 50
-        spacing: 30
-
-        Rectangle {
-            width: 600
-            height: 350
-            color: "#ffffff"
-
-            Image {
-                anchors.fill: parent
-                source: "qrc:/Images/mapsmallwarehouse.png"
-            }
-
-            Canvas {
-                anchors.fill: parent
-                property var globalPath: []
-
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = "blue";
-
-                    if (globalPath.length > 1) {
-                        ctx.beginPath();
-                        ctx.moveTo(globalPath[0].x, globalPath[0].y);
-                        for (var i = 1; i < globalPath.length; i++) {
-                            ctx.lineTo(globalPath[i].x, globalPath[i].y);
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            console.log("Heading to charging station.")
+                            rosConnector.goToChargingStation()
                         }
-                        ctx.stroke();
                     }
                 }
             }
+        }
 
-            // Robot Icon
-            Image {
-                source: "qrc:/Images/LiftRobot.png"
-                width: 40
-                height: 40
-                x: cameraMapRow.robotX
-                y: cameraMapRow.robotY
-                rotation: cameraMapRow.robotRotation
-                transformOrigin: Item.Center
-                smooth: true
-                antialiasing: true
+        // Robot Movement
+        Item {
+            id: controlPanel
+            width: parent.width
+            height: parent.height
+
+            property int buttonSize: 70
+            property int stopSize: 70
+            property int spacing: 15
+
+            FocusScope {
+                id: keyHandler
+                focus: true
+
+                onVisibleChanged: {
+                    if (manualControlPage.visible === true) keyHandler.forceActiveFocus();
+                }
+
+                Keys.onPressed: (event) => {
+                                    event.accepted = true;
+
+                                    switch (event.key) {
+                                        case 16777235: // Numpad 8
+                                        console.log("Move Forward");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        break;
+                                        case 16777237: // Numpad 2
+                                        console.log("Move Backward");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        break;
+                                        case 16777234: // Numpad 4
+                                        console.log("Move Left");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        break;
+                                        case 16777236: // Numpad 6
+                                        console.log("Move Right");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        break;
+                                        case 16777233: // Numpad 7
+                                        console.log("Move North-West");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        break;
+                                        case 16777239: // Numpad 9
+                                        console.log("Move North-East");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        break;
+                                        case 16777232: // Numpad 1
+                                        console.log("Move South-West");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        break;
+                                        case 16777238: // Numpad 3
+                                        console.log("Move South-East");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        break;
+                                        case 16777227: // Numpad 5
+                                        console.log("STOP");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        break;
+                                        case Qt.Key_A: // A key for Ascend
+                                        console.log("Lift Ascend");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
+                                        break;
+                                        case Qt.Key_D: // D key for Descend
+                                        console.log("Lift Descend");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        break;
+                                        case Qt.Key_S: // S key for Lift Stop
+                                        console.log("Lift Stop");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"x"}}');
+                                        break;
+                                        default:
+                                        console.log("Unknown Key:", event.key);
+                                    }
+                                }
+            }
+
+            Column {
+                id: movementGrid
+                spacing: controlPanel.spacing
+
+                // Row 1: NW, UP, NE
+                Row {
+                    spacing: controlPanel.spacing
+                    Button {
+                        text: "↖"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move North-West") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+
+                    Button {
+                        text: "↑"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move Forward") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+
+                    Button {
+                        text: "↗"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move North-East") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+                }
+
+                // Row 2: LEFT, STOP, RIGHT
+                Row {
+                    spacing: controlPanel.spacing
+                    Button {
+                        text: "←"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move Left") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+
+                    Button {
+                        text: "STOP"
+                        width: controlPanel.stopSize
+                        height: controlPanel.stopSize
+                        font.pointSize: 16
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                console.log("STOP")
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                            }
+                        }
+                        background: Rectangle {
+                            color: "red"
+                            radius: 10
+                        }
+
+                        contentItem: Text {
+                            text: "STOP"
+                            font.pointSize: 16
+                            color: "white"
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.fill: parent
+                        }
+                    }
+
+                    Button {
+                        text: "→"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move Right") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+                }
+
+                // Row 3: SW, DOWN, SE
+                Row {
+                    spacing: controlPanel.spacing
+                    Button {
+                        text: "↙"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move South-West") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+
+                    Button {
+                        text: "↓"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move Backward") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+
+                    Button {
+                        text: "↘"
+                        width: controlPanel.buttonSize
+                        height: controlPanel.buttonSize
+                        font.pointSize: 22
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: console.log("Move South-East") &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
+                        }
+                        background: Rectangle { color: "#DBE2E9"; radius: 10 }
+                    }
+                }
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.rightMargin: 30
+                anchors.topMargin: 190
             }
         }
 
-        NumberAnimation on robotX {
-            duration: 200
-        }
+        // Mechanism Control
+        Item {
+            id: mechanismControl
+            anchors.fill: parent
 
-        NumberAnimation on robotY {
-            duration: 200
-        }
+            property int buttonWidth: 140
+            property int buttonHeight: 50
+            property int buttonRadius: 10
 
-        Connections {
-            target: rosConnector
-
-            function onPoseReceived(json) {
-                var pose = JSON.parse(json);
-                var x = pose.position.x;
-                var y = pose.position.y;
-                var q = pose.orientation;
-
-                console.log("Received Robot Position -> X: ", x, "Y: ", y);
-
-                if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
-                    cameraMapRow.originX = x;
-                    cameraMapRow.originY = y;
-                    console.log("Origin set to:", x, y);
+            // Ascend Button
+            Button {
+                id: ascend
+                width: 100
+                text: "Ascend"
+                focusPolicy: Qt.NoFocus
+                height: mechanismControl.buttonHeight
+                font.pointSize: 16
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.rightMargin: 160
+                anchors.topMargin: 550
+                font.bold: false
+                font.family: "Tahoma"
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        console.log("Lift Ascend");
+                        rosConnector.sendMessage(JSON.stringify({
+                                                                    op: "publish",
+                                                                    topic: "/linear_actuator_cmd",
+                                                                    msg: {
+                                                                        data: "0"
+                                                                    }
+                                                                }));
+                    }
                 }
-
-                cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
-                cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
-                cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                background: Rectangle {
+                    color: "#DBE2E9"
+                    radius: mechanismControl.buttonRadius
+                }
             }
 
-            function onGlobalPathReceived(json) {
-                var arr = JSON.parse(json);
+            // Descend Button
+            Button {
+                id: descend
+                width: 100
+                text: "Descend"
+                focusPolicy: Qt.NoFocus
+                height: mechanismControl.buttonHeight
+                font.pointSize: 16
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.leftMargin: -130
+                anchors.topMargin: 550
+                font.family: "Tahoma"
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        console.log("Lift Descend");
+                        rosConnector.sendMessage(JSON.stringify({
+                                                                    op: "publish",
+                                                                    topic: "/linear_actuator_cmd",
+                                                                    msg: {
+                                                                        data: "1"
+                                                                    }
+                                                                }));
+                    }
+                }
+                background: Rectangle {
+                    color: "#DBE2E9"
+                    radius: mechanismControl.buttonRadius
+                }
+            }
+            // Stop Button
+            Button {
+                id: stoplift
+                width: 100
+                text: "Stop"
+                focusPolicy: Qt.NoFocus
+                height: mechanismControl.buttonHeight
+                font.pointSize: 16
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.leftMargin: -200
+                anchors.topMargin: 620
+                font.family: "Tahoma"
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        console.log("Lift Stop");
+                        rosConnector.sendMessage(JSON.stringify({
+                                                                    op: "publish",
+                                                                    topic: "/linear_actuator_cmd",
+                                                                    msg: {
+                                                                        data: "x"
+                                                                    }
+                                                                }));
+                    }
+                }
+                background: Rectangle {
+                    color: "#DBE2E9"
+                    radius: mechanismControl.buttonRadius
+                }
+            }
+        }
 
-                if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
-                    console.log("Skipping path drawing until origin is known.");
-                    return;
+        // Digital Twin
+        Row {
+            property real mapScalex: 59
+            property real mapScaley: 48
+            property real mapWidth: digitalTwinMap.width
+            property real mapHeight: digitalTwinMap.height
+
+            // Initial pixel anchor
+            property real initialPixelX: 50
+            property real initialPixelY: 90
+
+            // Dynamic robot pose in pixels
+            property real robotX: initialPixelX
+            property real robotY: initialPixelY
+            property real robotRotation: 0
+
+            // AMCL origin to align ROS coordinates with pixel space
+            property real originX: undefined
+            property real originY: undefined
+
+            // Convert from ROS meters to pixels
+            function metersToPixelsX(x) {
+                return (x - originX) * mapScalex + initialPixelX;
+            }
+
+            function metersToPixelsY(y) {
+                return initialPixelY - (y - originY) * mapScaley;
+            }
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 220
+            anchors.rightMargin: 100
+            spacing: 30
+
+            Rectangle {
+                width: 900
+                height: 450
+                color: "#f0f0f0"
+
+                Image {
+                    anchors.fill: parent
+                    source: "qrc:/Images/map_with_shelves.png"
                 }
 
-                pathCanvas.globalPath = arr.map(p => ({
-                                                          x: cameraMapRow.metersToPixelsX(p.pose.position.x),
-                                                          y: cameraMapRow.metersToPixelsY(p.pose.position.y)
-                                                      }));
-                pathCanvas.requestPaint();
+                // Global path canvas
+                Canvas {
+                    anchors.fill: parent
+                    property var globalPath: []
+
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = "blue";
+
+                        if (globalPath.length > 1) {
+                            ctx.beginPath();
+                            ctx.moveTo(globalPath[0].x, globalPath[0].y);
+                            for (var i = 1; i < globalPath.length; i++) {
+                                ctx.lineTo(globalPath[i].x, globalPath[i].y);
+                            }
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Robot Icon
+                Image {
+                    source: "qrc:/Images/LiftRobot.png"
+                    width: 40
+                    height: 40
+                    x: cameraMapRow.robotX - width / 2
+                    y: cameraMapRow.robotY - height / 2
+                    rotation: cameraMapRow.robotRotation
+                    transformOrigin: Item.Center
+                    smooth: true
+                    antialiasing: true
+                }
+
+                // Goal marker
+                Image {
+                    source: "qrc:/Images/flag.png"
+                    width: 40
+                    height: 40
+                    visible: false
+                    z: 10
+                    smooth: true
+                    antialiasing: true
+                }
+            }
+
+            NumberAnimation on robotX { duration: 200 }
+            NumberAnimation on robotY { duration: 200 }
+
+            Connections {
+                target: rosConnector
+
+                function onPoseReceived(json) {
+                    var pose = JSON.parse(json);
+                    var x = pose.position.x;
+                    var y = pose.position.y;
+                    var q = pose.orientation;
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                        cameraMapRow.originX = x;
+                        cameraMapRow.originY = y;
+                        console.log("Origin set to:", x, y);
+                    }
+
+                    cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
+                    cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
+                    cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                }
+
+                function onGlobalPathReceived(json) {
+                    var arr = JSON.parse(json);
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                        console.log("Skipping path drawing until origin is known.");
+                        return;
+                    }
+
+                    pathCanvas.globalPath = arr.map(p => ({
+                                                              x: cameraMapRow.metersToPixelsX(p.pose.position.x),
+                                                              y: cameraMapRow.metersToPixelsY(p.pose.position.y)
+                                                          }));
+                    pathCanvas.requestPaint();
+                }
+
+                function onGoalReceived(json) {
+                    var goal = JSON.parse(json);
+                    var x = goal.position.x;
+                    var y = goal.position.y;
+
+                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined)
+                        return;
+
+                    var pixelX = cameraMapRow.metersToPixelsX(x);
+                    var pixelY = cameraMapRow.metersToPixelsY(y);
+
+                    goalMarker.visible = true;
+                    goalMarker.x = pixelX - goalMarker.width / 2;
+                    goalMarker.y = pixelY - goalMarker.height / 2;
+
+                    console.log("Goal marker placed at:", pixelX, pixelY);
+                }
+            }
+        }
+
+        // Back Button
+        Button {
+            text: "Back"
+            focusPolicy: Qt.NoFocus
+            width: 80
+            height: 40
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 20
+            anchors.bottomMargin: 20
+            font.bold: false
+            font.pointSize: 10
+            font.family: "Tahoma"
+            display: AbstractButton.TextOnly
+
+            background: Rectangle {
+                color: "#D32F2F"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 18
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.bold: true
+                color: "white"
+                anchors.centerIn: parent
+            }
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    manualControlPage.visible = false
+                    selectionPage.visible = true
+                }
             }
         }
     }
-
-    // Back Button
-    Button {
-        text: "Back"
-        focusPolicy: Qt.NoFocus
-        width: 80
-        height: 40
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: 20
-        anchors.bottomMargin: 20
-        font.bold: false
-        font.pointSize: 10
-        font.family: "Tahoma"
-        display: AbstractButton.TextOnly
-
-        background: Rectangle {
-            color: "#D32F2F"
-            radius: 10
-        }
-
-        contentItem: Text {
-            text: parent.text
-            font.pixelSize: 18
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.bold: true
-            color: "white"
-            anchors.centerIn: parent
-        }
-
-        onClicked: {
-            manualControlPage.visible = false
-            selectionPage.visible = true
-        }
-    }
-}
 }

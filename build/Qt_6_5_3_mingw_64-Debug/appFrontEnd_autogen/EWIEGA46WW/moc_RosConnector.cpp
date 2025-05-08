@@ -48,17 +48,22 @@ static constexpr auto qt_meta_stringdata_CLASSRosConnectorENDCLASS = QtMocHelper
     "mapReceived",
     "globalPathReceived",
     "localPathReceived",
+    "goalReceived",
+    "costmapReceived",
     "onConnected",
     "onDisconnected",
     "connectToRos",
     "goToChargingStation",
     "sendMessage",
     "message",
+    "sendGoal",
+    "x",
+    "y",
     "isConnected"
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSRosConnectorENDCLASS_t {
-    uint offsetsAndSizes[34];
+    uint offsetsAndSizes[44];
     char stringdata0[13];
     char stringdata1[15];
     char stringdata2[1];
@@ -69,13 +74,18 @@ struct qt_meta_stringdata_CLASSRosConnectorENDCLASS_t {
     char stringdata7[12];
     char stringdata8[19];
     char stringdata9[18];
-    char stringdata10[12];
-    char stringdata11[15];
-    char stringdata12[13];
-    char stringdata13[20];
-    char stringdata14[12];
-    char stringdata15[8];
+    char stringdata10[13];
+    char stringdata11[16];
+    char stringdata12[12];
+    char stringdata13[15];
+    char stringdata14[13];
+    char stringdata15[20];
     char stringdata16[12];
+    char stringdata17[8];
+    char stringdata18[9];
+    char stringdata19[2];
+    char stringdata20[2];
+    char stringdata21[12];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSRosConnectorENDCLASS_t::offsetsAndSizes) + ofs), len 
@@ -91,13 +101,18 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSRosConnectorENDCLASS_t qt_meta_
         QT_MOC_LITERAL(88, 11),  // "mapReceived"
         QT_MOC_LITERAL(100, 18),  // "globalPathReceived"
         QT_MOC_LITERAL(119, 17),  // "localPathReceived"
-        QT_MOC_LITERAL(137, 11),  // "onConnected"
-        QT_MOC_LITERAL(149, 14),  // "onDisconnected"
-        QT_MOC_LITERAL(164, 12),  // "connectToRos"
-        QT_MOC_LITERAL(177, 19),  // "goToChargingStation"
-        QT_MOC_LITERAL(197, 11),  // "sendMessage"
-        QT_MOC_LITERAL(209, 7),  // "message"
-        QT_MOC_LITERAL(217, 11)   // "isConnected"
+        QT_MOC_LITERAL(137, 12),  // "goalReceived"
+        QT_MOC_LITERAL(150, 15),  // "costmapReceived"
+        QT_MOC_LITERAL(166, 11),  // "onConnected"
+        QT_MOC_LITERAL(178, 14),  // "onDisconnected"
+        QT_MOC_LITERAL(193, 12),  // "connectToRos"
+        QT_MOC_LITERAL(206, 19),  // "goToChargingStation"
+        QT_MOC_LITERAL(226, 11),  // "sendMessage"
+        QT_MOC_LITERAL(238, 7),  // "message"
+        QT_MOC_LITERAL(246, 8),  // "sendGoal"
+        QT_MOC_LITERAL(255, 1),  // "x"
+        QT_MOC_LITERAL(257, 1),  // "y"
+        QT_MOC_LITERAL(259, 11)   // "isConnected"
     },
     "RosConnector",
     "connectedToRos",
@@ -109,12 +124,17 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSRosConnectorENDCLASS_t qt_meta_
     "mapReceived",
     "globalPathReceived",
     "localPathReceived",
+    "goalReceived",
+    "costmapReceived",
     "onConnected",
     "onDisconnected",
     "connectToRos",
     "goToChargingStation",
     "sendMessage",
     "message",
+    "sendGoal",
+    "x",
+    "y",
     "isConnected"
 };
 #undef QT_MOC_LITERAL
@@ -127,35 +147,40 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
       11,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
-       1,  108, // properties
+      15,   14, // methods
+       1,  137, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       7,       // signalCount
+       9,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   86,    2, 0x06,    2 /* Public */,
-       3,    0,   87,    2, 0x06,    3 /* Public */,
-       4,    0,   88,    2, 0x06,    4 /* Public */,
-       5,    1,   89,    2, 0x06,    5 /* Public */,
-       7,    1,   92,    2, 0x06,    7 /* Public */,
-       8,    1,   95,    2, 0x06,    9 /* Public */,
-       9,    1,   98,    2, 0x06,   11 /* Public */,
+       1,    0,  104,    2, 0x06,    2 /* Public */,
+       3,    0,  105,    2, 0x06,    3 /* Public */,
+       4,    0,  106,    2, 0x06,    4 /* Public */,
+       5,    1,  107,    2, 0x06,    5 /* Public */,
+       7,    1,  110,    2, 0x06,    7 /* Public */,
+       8,    1,  113,    2, 0x06,    9 /* Public */,
+       9,    1,  116,    2, 0x06,   11 /* Public */,
+      10,    1,  119,    2, 0x06,   13 /* Public */,
+      11,    1,  122,    2, 0x06,   15 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      10,    0,  101,    2, 0x08,   13 /* Private */,
-      11,    0,  102,    2, 0x08,   14 /* Private */,
+      12,    0,  125,    2, 0x08,   17 /* Private */,
+      13,    0,  126,    2, 0x08,   18 /* Private */,
 
  // methods: name, argc, parameters, tag, flags, initial metatype offsets
-      12,    0,  103,    2, 0x02,   15 /* Public */,
-      13,    0,  104,    2, 0x02,   16 /* Public */,
-      14,    1,  105,    2, 0x02,   17 /* Public */,
+      14,    0,  127,    2, 0x02,   19 /* Public */,
+      15,    0,  128,    2, 0x02,   20 /* Public */,
+      16,    1,  129,    2, 0x02,   21 /* Public */,
+      18,    2,  132,    2, 0x02,   23 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    6,
+    QMetaType::Void, QMetaType::QString,    6,
     QMetaType::Void, QMetaType::QString,    6,
     QMetaType::Void, QMetaType::QString,    6,
     QMetaType::Void, QMetaType::QString,    6,
@@ -168,10 +193,11 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
  // methods: parameters
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   15,
+    QMetaType::Void, QMetaType::QString,   17,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double,   19,   20,
 
  // properties: name, type, flags
-      16, QMetaType::Bool, 0x00015001, uint(2), 0,
+      21, QMetaType::Bool, 0x00015001, uint(2), 0,
 
        0        // eod
 };
@@ -205,6 +231,12 @@ Q_CONSTINIT const QMetaObject RosConnector::staticMetaObject = { {
         // method 'localPathReceived'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'goalReceived'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'costmapReceived'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
         // method 'onConnected'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onDisconnected'
@@ -215,7 +247,11 @@ Q_CONSTINIT const QMetaObject RosConnector::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'sendMessage'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'sendGoal'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<double, std::false_type>,
+        QtPrivate::TypeAndForceComplete<double, std::false_type>
     >,
     nullptr
 } };
@@ -233,11 +269,14 @@ void RosConnector::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 4: _t->mapReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 5: _t->globalPathReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 6: _t->localPathReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 7: _t->onConnected(); break;
-        case 8: _t->onDisconnected(); break;
-        case 9: _t->connectToRos(); break;
-        case 10: _t->goToChargingStation(); break;
-        case 11: _t->sendMessage((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 7: _t->goalReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 8: _t->costmapReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 9: _t->onConnected(); break;
+        case 10: _t->onDisconnected(); break;
+        case 11: _t->connectToRos(); break;
+        case 12: _t->goToChargingStation(); break;
+        case 13: _t->sendMessage((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 14: _t->sendGoal((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -291,6 +330,20 @@ void RosConnector::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
                 return;
             }
         }
+        {
+            using _t = void (RosConnector::*)(const QString & );
+            if (_t _q_method = &RosConnector::goalReceived; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 7;
+                return;
+            }
+        }
+        {
+            using _t = void (RosConnector::*)(const QString & );
+            if (_t _q_method = &RosConnector::costmapReceived; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 8;
+                return;
+            }
+        }
     }else if (_c == QMetaObject::ReadProperty) {
         auto *_t = static_cast<RosConnector *>(_o);
         (void)_t;
@@ -324,13 +377,13 @@ int RosConnector::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 12)
+        if (_id < 15)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 12;
+        _id -= 15;
     }else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::BindableProperty
             || _c == QMetaObject::RegisterPropertyMetaType) {
@@ -384,5 +437,19 @@ void RosConnector::localPathReceived(const QString & _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 6, _a);
+}
+
+// SIGNAL 7
+void RosConnector::goalReceived(const QString & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 7, _a);
+}
+
+// SIGNAL 8
+void RosConnector::costmapReceived(const QString & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 8, _a);
 }
 QT_WARNING_POP

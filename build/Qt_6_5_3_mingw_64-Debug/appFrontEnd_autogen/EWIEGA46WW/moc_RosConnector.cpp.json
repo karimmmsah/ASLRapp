@@ -23,6 +23,21 @@
                     ],
                     "name": "sendMessage",
                     "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "x",
+                            "type": "double"
+                        },
+                        {
+                            "name": "y",
+                            "type": "double"
+                        }
+                    ],
+                    "name": "sendGoal",
+                    "returnType": "void"
                 }
             ],
             "object": true,
@@ -101,6 +116,28 @@
                         }
                     ],
                     "name": "localPathReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "goalReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "costmapReceived",
                     "returnType": "void"
                 }
             ],

@@ -15,10 +15,11 @@ class RosConnector : public QObject {
 public:
     explicit RosConnector(QObject *parent = nullptr);
     void onMessageReceived(const QString &message);
+    bool isConnected() const { return m_isConnected; }
     Q_INVOKABLE void connectToRos();
     Q_INVOKABLE void goToChargingStation();
     Q_INVOKABLE void sendMessage(const QString &message);
-    bool isConnected() const { return m_isConnected; } 
+    Q_INVOKABLE void sendGoal(double x, double y);
 
 signals:
     void connectedToRos();
@@ -28,6 +29,8 @@ signals:
     void mapReceived(const QString &json);
     void globalPathReceived(const QString &json);
     void localPathReceived(const QString &json);
+    void goalReceived(const QString &json);
+    void costmapReceived(const QString &json);
 
 private slots:
     void onConnected();
