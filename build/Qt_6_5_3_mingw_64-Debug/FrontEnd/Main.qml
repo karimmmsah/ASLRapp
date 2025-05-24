@@ -8,7 +8,7 @@ import QtMultimedia
 // Main
 Window {
     id: main
-    visible: false
+    visible: true
     visibility: Window.FullScreen
     title: qsTr("ASLR Control Panel")
     color: "#ffffff"
@@ -230,9 +230,80 @@ Window {
 
                 Connections {
                     target: rosConnector
+
                     function onConnectedToRos() {
                         connectPage.visible = false;
                         loginPage.visible = true;
+                    }
+
+                    function onConnectionFailed() {
+                        connectionErrorDialog.open();
+                    }
+                }
+            }
+
+            // Connection Error Dialog
+            Dialog {
+                id: connectionErrorDialog
+                modal: true
+                width: 360
+                height: 160
+
+                x: (parent.width - width) / 2
+                y: (parent.height - height) / 1.85
+
+                background: Rectangle {
+                    color: "#F8F9FA"
+                    radius: 10
+                }
+
+                contentItem: Column {
+                    spacing: 25
+                    anchors.fill: parent
+                    anchors.margins: 30
+
+                    Label {
+                        text: "Connection failed.\nPlease connect your ASLR to the network."
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "#D32F2F"
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Row {
+                        spacing: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        Button {
+                            text: "OK"
+                            width: 80
+                            height: 40
+
+                            background: Rectangle {
+                                color: "#E0E0E0"
+                                radius: 10
+                            }
+
+                            contentItem: Text {
+                                text: "OK"
+                                font.pixelSize: 16
+                                font.bold: true
+                                color: "black"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: connectionErrorDialog.close()
+                            }
+
+                            Keys.onReturnPressed: connectionErrorDialog.close()
+                        }
                     }
                 }
             }
@@ -946,7 +1017,7 @@ Window {
     Item {
         id: automaticControlPage
         anchors.fill: parent
-        visible: true
+        visible: false
 
         // Time & Date Display
         Item {
@@ -1158,7 +1229,7 @@ Window {
                         statusLabel.color = "orange";
                     } else if (status === true) {
                         statusLabel.text = "Busy";
-                        statusLabel.color = "red";
+                        statusLabel.color = "green";
                     }
                 }
             }
@@ -1242,13 +1313,35 @@ Window {
             }
         }
 
+        // Notification
+        Text {
+            id: statusMessage
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 120
+            font.pointSize: 14
+            font.bold: true
+            font.family: "Tahoma"
+            color: "black"
+            visible: false
+            text: " "
+        }
+
+        Timer {
+            id: statusTimer
+            interval: 5000
+            running: false
+            repeat: false
+            onTriggered: statusMessage.visible = false
+        }
+
         // Pick & Drop
         Column {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 190
             anchors.rightMargin: 80
-            spacing: 30
+            spacing: 80
 
             property var goalCoordinates: {
                 "Shelf A": { x: 8.47661 , y: 0.073312 },
@@ -1275,7 +1368,7 @@ Window {
 
                 ComboBox {
                     id: shelfDropdown
-                    width: 200
+                    width: 180
                     height: 40
                     model: ["", "Shelf A", "Shelf B", "Shelf C" , "Shelf D"]
                     currentIndex: -1
@@ -1357,10 +1450,10 @@ Window {
             text: "PICK"
             width: 180
             height: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: -300
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 30
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 280
+            anchors.rightMargin: 80
             font.bold: true
             font.pointSize: 14
 
@@ -1402,8 +1495,15 @@ Window {
                     if (goal) {
                         console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
                         rosConnector.sendGoal(goal.x, goal.y);
+                        statusMessage.text = "ASLR is going to " + shelf + "...";
+                        statusMessage.color = "green";
+                        statusMessage.visible = true;
                     } else {
-                        console.warn("Invalid goal selected!");
+                        console.warn("Invalid shelf selected!");
+                        statusMessage.text = "Please select a valid shelf.";
+                        statusMessage.color = "red";
+                        statusMessage.visible = true;
+                        statusTimer.start();
                     }
                 }
             }
@@ -1414,10 +1514,10 @@ Window {
             text: "DROP"
             width: 180
             height: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: +50
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 30
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 440
+            anchors.rightMargin: 80
             font.bold: true
             font.pointSize: 14
 
@@ -1459,79 +1559,15 @@ Window {
                     if (goal) {
                         console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
                         rosConnector.sendGoal(goal.x, goal.y);
+                        statusMessage.text = "Dropping the shelf at " + location + "...";
+                        statusMessage.color = "green";
+                        statusMessage.visible = true;
                     } else {
-                        console.warn("Invalid goal selected!");
-                    }
-                }
-            }
-        }
-
-        // Unified Pick & Drop Button
-        Button {
-            text: "EXECUTE"
-            width: 180
-            height: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            anchors.topMargin: 120
-            font.bold: true
-            font.pointSize: 16
-
-            background: Rectangle {
-                color: "#2bd91b"
-                radius: 10
-            }
-
-            contentItem: Text {
-                text: parent.text
-                font.pixelSize: 22
-                font.bold: true
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.family: "Tahoma"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                property var goalCoordinates: {
-                    "Shelf A": { x: 8.47661 , y: 0.073312 },
-                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
-                    "Shelf C": { x: 2.51197 , y: -4.50967 },
-                    "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 10.8946 , y: -2.29781 },
-                    "Location 2": { x: 13.2928 , y: -5.59084 },
-                    "Location 3": { x: 10.8946 , y: -6.70115 }
-                }
-
-                onClicked: {
-                    if (shelfDropdown.currentText && locationDropdown.currentText) {
-                        var shelf = shelfDropdown.currentText;
-                        var shelfGoal = goalCoordinates[shelf];
-                        console.log("Selected Shelf: " + shelf);
-
-                        if (shelfGoal) {
-                            console.log("Sending shelf goal: x=" + shelfGoal.x + " y=" + shelfGoal.y);
-                            rosConnector.sendGoal(shelfGoal.x, shelfGoal.y);
-                            rosConnector.goalReached.connect(function() {
-                                var location = locationDropdown.currentText;
-                                var locationGoal = goalCoordinates[location];
-                                console.log("Selected Location: " + location);
-
-                                if (locationGoal) {
-                                    console.log("Sending location goal: x=" + locationGoal.x + " y=" + locationGoal.y);
-                                    rosConnector.sendGoal(locationGoal.x, locationGoal.y);
-                                } else {
-                                    console.warn("Invalid location selected!");
-                                }
-                            });
-                        } else {
-                            console.warn("Invalid shelf selected!");
-                        }
-                    } else {
-                        console.warn("Please select both a shelf and a location!");
+                        console.warn("Invalid location selected!");
+                        statusMessage.text = "Please select a valid location.";
+                        statusMessage.color = "red";
+                        statusMessage.visible = true;
+                        statusTimer.start();
                     }
                 }
             }
@@ -1584,14 +1620,14 @@ Window {
                 width: 160
                 height: 50
                 x: parent.width - width - 90
-                y: 440
+                y: 520
                 text: qrScanner.cameraVisible ? "CLOSE QR CAMERA" : "OPEN QR CAMERA"
 
                 font.pointSize: 12
                 font.bold: true
 
                 background: Rectangle {
-                    color: qrScanner.cameraVisible ? "#33dc23" : "#ff9a00"
+                    color: qrScanner.cameraVisible ? "#ff9a00" : "#ff9a00"
                     radius: 12
                 }
 
@@ -1626,7 +1662,7 @@ Window {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.rightMargin: 90
-            anchors.topMargin: 540
+            anchors.topMargin: 600
 
             background: Rectangle {
                 color: "red";
@@ -1647,9 +1683,13 @@ Window {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: console.log("Emergency Stop Triggered!") &
-                           rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
-                           rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                onClicked: {console.log("Emergency Stop Triggered!");
+                    rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                    rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                    statusMessage.text = "ASLR Stopped!";
+                    statusMessage.color = "red";
+                    statusMessage.visible = true;
+                }
             }
         }
 
@@ -1686,7 +1726,7 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.topMargin: 220
+            anchors.topMargin: 230
             anchors.rightMargin: 100
             spacing: 30
 
@@ -2093,7 +2133,7 @@ Window {
                         mstatusLabel.color = "orange";
                     } else if (status === true) {
                         mstatusLabel.text = "Busy";
-                        mstatusLabel.color = "red";
+                        mstatusLabel.color = "green";
                     }
                 }
             }
@@ -2207,10 +2247,36 @@ Window {
                         onClicked: {
                             console.log("Heading to charging station.")
                             rosConnector.goToChargingStation()
+                            mstatusMessage.text = "Heading to Charging Station."
+                            mstatusMessage.color = "orange"
+                            mstatusMessage.visible = true
+                            mstatusTimer.start();
                         }
                     }
                 }
             }
+        }
+
+        // Notification
+        Text {
+            id: mstatusMessage
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 160
+            font.pointSize: 14
+            font.bold: true
+            font.family: "Tahoma"
+            color: "black"
+            visible: false
+            text: " "
+        }
+
+        Timer {
+            id: mstatusTimer
+            interval: 3000
+            running: false
+            repeat: false
+            onTriggered: mstatusMessage.visible = false
         }
 
         // Robot Movement
@@ -2239,58 +2305,117 @@ Window {
                                         console.log("Move Forward");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        mstatusMessage.text = "Moving Forward...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case 16777237: // Numpad 2
                                         console.log("Move Backward");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        mstatusMessage.text = "Moving Backward...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case 16777234: // Numpad 4
                                         console.log("Move Left");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        mstatusMessage.text = "Moving Left...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case 16777236: // Numpad 6
                                         console.log("Move Right");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        mstatusMessage.text = "Moving Right...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
-                                        case 16777233: // Numpad 7
+
+                                        case 16777232: // Numpad 7
                                         console.log("Move North-West");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        mstatusMessage.text = "Moving NW...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
-                                        case 16777239: // Numpad 9
+
+                                        case 16777238: // Numpad 9
                                         console.log("Move North-East");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        mstatusMessage.text = "Moving NE...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
-                                        case 16777232: // Numpad 1
+
+                                        case 16777233: // Numpad 1
                                         console.log("Move South-West");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        mstatusMessage.text = "Moving SW...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
-                                        case 16777238: // Numpad 3
+
+                                        case 16777239: // Numpad 3
                                         console.log("Move South-East");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        mstatusMessage.text = "Moving SE...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case 16777227: // Numpad 5
                                         console.log("STOP");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        mstatusMessage.text = "ASLR Stopped.";
+                                        mstatusMessage.color = "red";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case Qt.Key_A: // A key for Ascend
                                         console.log("Lift Ascend");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
+                                        mstatusMessage.text = "Ascedning Mechanism...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case Qt.Key_D: // D key for Descend
                                         console.log("Lift Descend");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        mstatusMessage.text = "Descending Mechanism...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
+
                                         case Qt.Key_S: // S key for Lift Stop
                                         console.log("Lift Stop");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"x"}}');
+                                        mstatusMessage.text = "Mechanism Stopped.";
+                                        mstatusMessage.color = "red";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
                                         break;
                                         default:
                                         console.log("Unknown Key:", event.key);
@@ -2314,9 +2439,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move North-West") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
+                            onClicked: {
+                                console.log("Move North-West") &
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                mstatusMessage.text = "Moving NW...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2330,9 +2461,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move Forward") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                            onClicked: {
+                                console.log("Move Forward");
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                mstatusMessage.text = "Moving Forward...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2346,9 +2483,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move North-East") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
+                            onClicked: {
+                                console.log("Move North-East");
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                mstatusMessage.text = "Moving NE...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2366,9 +2509,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move Left") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
+                            onClicked: {
+                                console.log("Move Left");
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                            mstatusMessage.text = "Moving Left...";
+                            mstatusMessage.color = "green";
+                            mstatusMessage.visible = true;
+                            mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2383,9 +2532,13 @@ Window {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                console.log("STOP")
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
+                                console.log("STOP");
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                mstatusMessage.text = "ASLR Stopped.";
+                                mstatusMessage.color = "red";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
                             }
                         }
                         background: Rectangle {
@@ -2413,9 +2566,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move Right") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
+                            onClicked: {
+                                console.log("Move Right");
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                            mstatusMessage.text = "Moving Right...";
+                            mstatusMessage.color = "green";
+                            mstatusMessage.visible = true;
+                            mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2433,9 +2592,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move South-West") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}')
+                            onClicked: {
+                                console.log("Move South-West");
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                            mstatusMessage.text = "Moving SW...";
+                            mstatusMessage.color = "green";
+                            mstatusMessage.visible = true;
+                            mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2449,10 +2614,16 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move Backward") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}')
-                        }
+                            onClicked: {
+                                console.log("Move Backward");
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                mstatusMessage.text = "Moving Backward...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
+                            }
+                            }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
 
@@ -2465,9 +2636,15 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: console.log("Move South-East") &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}') &
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}')
+                            onClicked: {
+                                console.log("Move South-East");
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                            mstatusMessage.text = "Moving SE...";
+                            mstatusMessage.color = "green";
+                            mstatusMessage.visible = true;
+                            mstatusTimer.start();
+                            }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
@@ -2515,6 +2692,10 @@ Window {
                                                                         data: "0"
                                                                     }
                                                                 }));
+                        mstatusMessage.text = "Ascending Mechanism...";
+                        mstatusMessage.color = "green";
+                        mstatusMessage.visible = true;
+                        mstatusTimer.start();
                     }
                 }
                 background: Rectangle {
@@ -2549,6 +2730,10 @@ Window {
                                                                         data: "1"
                                                                     }
                                                                 }));
+                        mstatusMessage.text = "Descending Mechanism...";
+                        mstatusMessage.color = "green";
+                        mstatusMessage.visible = true;
+                        mstatusTimer.start();
                     }
                 }
                 background: Rectangle {
@@ -2556,11 +2741,10 @@ Window {
                     radius: mechanismControl.buttonRadius
                 }
             }
-            // Stop Button
             Button {
                 id: stoplift
                 width: 100
-                text: "Stop"
+                text: "STOP"
                 focusPolicy: Qt.NoFocus
                 height: mechanismControl.buttonHeight
                 font.pointSize: 16
@@ -2569,6 +2753,7 @@ Window {
                 anchors.leftMargin: -200
                 anchors.topMargin: 620
                 font.family: "Tahoma"
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -2576,27 +2761,44 @@ Window {
                     onClicked: {
                         console.log("Lift Stop");
                         rosConnector.sendMessage(JSON.stringify({
-                                                                    op: "publish",
-                                                                    topic: "/linear_actuator_cmd",
-                                                                    msg: {
-                                                                        data: "x"
-                                                                    }
-                                                                }));
+                            op: "publish",
+                            topic: "/linear_actuator_cmd",
+                            msg: {
+                                data: "x"
+                            }
+                        }));
+                        mstatusMessage.text = "Mechanism Stopped.";
+                        mstatusMessage.color = "red";
+                        mstatusMessage.visible = true;
+                        mstatusTimer.start();
                     }
                 }
+
                 background: Rectangle {
-                    color: "#DBE2E9"
+                    color: "red"
                     radius: mechanismControl.buttonRadius
+                }
+
+                contentItem: Text {
+                    text: parent.text
+                    color: "white"
+                    font.pointSize: parent.font.pointSize
+                    font.family: parent.font.family
+                    font.bold: false
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    anchors.centerIn: parent
                 }
             }
         }
 
         // Digital Twin
         Row {
+            id: mcameraMapRow
             property real mapScalex: 59
             property real mapScaley: 48
-            property real mapWidth: digitalTwinMap.width
-            property real mapHeight: digitalTwinMap.height
+            property real mapWidth: mdigitalTwinMap.width
+            property real mapHeight: mdigitalTwinMap.height
 
             // Initial pixel anchor
             property real initialPixelX: 50
@@ -2623,22 +2825,25 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.topMargin: 220
+            anchors.topMargin: 230
             anchors.rightMargin: 100
             spacing: 30
 
             Rectangle {
+                id: mdigitalTwinMap
                 width: 900
                 height: 450
                 color: "#f0f0f0"
 
                 Image {
+                    id: mmapImage
                     anchors.fill: parent
                     source: "qrc:/Images/map_with_shelves.png"
                 }
 
                 // Global path canvas
                 Canvas {
+                    id: mpathCanvas
                     anchors.fill: parent
                     property var globalPath: []
 
@@ -2661,12 +2866,13 @@ Window {
 
                 // Robot Icon
                 Image {
+                    id: mrobotIcon
                     source: "qrc:/Images/LiftRobot.png"
                     width: 40
                     height: 40
-                    x: cameraMapRow.robotX - width / 2
-                    y: cameraMapRow.robotY - height / 2
-                    rotation: cameraMapRow.robotRotation
+                    x: mcameraMapRow.robotX - width / 2
+                    y: mcameraMapRow.robotY - height / 2
+                    rotation: mcameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
@@ -2674,6 +2880,7 @@ Window {
 
                 // Goal marker
                 Image {
+                    id: mgoalMarker
                     source: "qrc:/Images/flag.png"
                     width: 40
                     height: 40
@@ -2684,8 +2891,8 @@ Window {
                 }
             }
 
-            NumberAnimation on robotX { duration: 200 }
-            NumberAnimation on robotY { duration: 200 }
+            NumberAnimation on robotX { duration: 5 }
+            NumberAnimation on robotY { duration: 5 }
 
             Connections {
                 target: rosConnector
@@ -2696,30 +2903,30 @@ Window {
                     var y = pose.position.y;
                     var q = pose.orientation;
 
-                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
-                        cameraMapRow.originX = x;
-                        cameraMapRow.originY = y;
+                    if (mcameraMapRow.originX === undefined || mcameraMapRow.originY === undefined) {
+                        mcameraMapRow.originX = x;
+                        mcameraMapRow.originY = y;
                         console.log("Origin set to:", x, y);
                     }
 
-                    cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
-                    cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
-                    cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                    mcameraMapRow.robotX = mcameraMapRow.metersToPixelsX(x);
+                    mcameraMapRow.robotY = mcameraMapRow.metersToPixelsY(y);
+                    mcameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
                 }
 
                 function onGlobalPathReceived(json) {
                     var arr = JSON.parse(json);
 
-                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
+                    if (mcameraMapRow.originX === undefined || mcameraMapRow.originY === undefined) {
                         console.log("Skipping path drawing until origin is known.");
                         return;
                     }
 
-                    pathCanvas.globalPath = arr.map(p => ({
-                                                              x: cameraMapRow.metersToPixelsX(p.pose.position.x),
-                                                              y: cameraMapRow.metersToPixelsY(p.pose.position.y)
-                                                          }));
-                    pathCanvas.requestPaint();
+                    mpathCanvas.globalPath = arr.map(p => ({
+                                                               x: mcameraMapRow.metersToPixelsX(p.pose.position.x),
+                                                               y: mcameraMapRow.metersToPixelsY(p.pose.position.y)
+                                                           }));
+                    mpathCanvas.requestPaint();
                 }
 
                 function onGoalReceived(json) {
@@ -2727,15 +2934,15 @@ Window {
                     var x = goal.position.x;
                     var y = goal.position.y;
 
-                    if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined)
+                    if (mcameraMapRow.originX === undefined || mcameraMapRow.originY === undefined)
                         return;
 
-                    var pixelX = cameraMapRow.metersToPixelsX(x);
-                    var pixelY = cameraMapRow.metersToPixelsY(y);
+                    var pixelX = mcameraMapRow.metersToPixelsX(x);
+                    var pixelY = mcameraMapRow.metersToPixelsY(y);
 
-                    goalMarker.visible = true;
-                    goalMarker.x = pixelX - goalMarker.width / 2;
-                    goalMarker.y = pixelY - goalMarker.height / 2;
+                    mgoalMarker.visible = true;
+                    mgoalMarker.x = pixelX - mgoalMarker.width / 2;
+                    mgoalMarker.y = pixelY - mgoalMarker.height / 2;
 
                     console.log("Goal marker placed at:", pixelX, pixelY);
                 }

@@ -85,8 +85,7 @@ void RosConnector::onMessageReceived(const QString &message) {
     } else if (topic == "/move_base/DWAPlannerROS/local_plan") {
         QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
         emit localPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
-    }
-    else if (topic == "/move_base/DWAPlannerROS/global_plan") {
+    } else if (topic == "/move_base/DWAPlannerROS/global_plan") {
         QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
         emit globalPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
     } else if (topic == "/move_base_simple/goal") {
