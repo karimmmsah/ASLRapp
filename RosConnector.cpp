@@ -44,6 +44,10 @@ void RosConnector::subscribeToTopics() {
         webSocket.sendTextMessage(QJsonDocument(obj).toJson());
     };
 
+    // Motor
+    subscribe("/cmd_vel", "geometry_msgs/Twist");
+    subscribe("/hoverboard_velocity_controller/cmd_vel", "geometry_msgs/Twist");
+
     // Battery & Status
     subscribe("/hoverboard/connected", "std_msgs/Bool");
     subscribe("/hoverboard/battery_voltage", "std_msgs/Float64");
@@ -91,6 +95,12 @@ void RosConnector::onMessageReceived(const QString &message) {
     } else if (topic == "/move_base_simple/goal") {
         QJsonObject pose = obj["msg"].toObject()["pose"].toObject();
         emit goalReceived(QJsonDocument(pose).toJson(QJsonDocument::Compact));
+    } else if (topic == "/cmd_vel") {
+        QJsonObject msg = obj["msg"].toObject();
+        emit cmdVelReceived(QJsonDocument(msg).toJson(QJsonDocument::Compact));
+    } else if (topic == "/hoverboard_velocity_controller/cmd_vel") {
+        QJsonObject msg = obj["msg"].toObject();
+        emit hoverboardCmdVelReceived(QJsonDocument(msg).toJson(QJsonDocument::Compact));
     }
 }
 

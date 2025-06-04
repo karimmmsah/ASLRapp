@@ -31,6 +31,8 @@ signals:
     void localPathReceived(const QString &json);
     void goalReceived(const QString &json);
     void costmapReceived(const QString &json);
+    void cmdVelReceived(const QString &twistJson);
+    void hoverboardCmdVelReceived(const QString &twistJson);
 
 private slots:
     void onConnected();

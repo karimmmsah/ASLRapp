@@ -139,6 +139,28 @@
                     ],
                     "name": "costmapReceived",
                     "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "twistJson",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "cmdVelReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "twistJson",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "hoverboardCmdVelReceived",
+                    "returnType": "void"
                 }
             ],
             "slots": [

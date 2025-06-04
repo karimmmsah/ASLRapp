@@ -707,14 +707,14 @@ Window {
                         height: 40
                         focus: true
                         background: Rectangle {
-                            color: "#008080"
+                            color: "#E0E0E0"
                             radius: 10
                         }
                         contentItem: Text {
                             text: "OK"
                             font.pixelSize: 16
                             font.bold: true
-                            color: "white"
+                            color: "black"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -1212,9 +1212,18 @@ Window {
                         try {
                             let data = JSON.parse(message);
                             console.log("Received message for status:", data);
-                            if (data.topic === "/hoverboard/connected") {
-                                let status = data.msg.data;
-                                updateStatus(status);
+
+                            if (data.topic === "/cmd_vel" || data.topic === "/hoverboard_velocity_controller/cmd_vel") {
+                                let twist = data.msg;
+                                let moving = !(
+                                    twist.linear.x === 0 &&
+                                    twist.linear.y === 0 &&
+                                    twist.linear.z === 0 &&
+                                    twist.angular.x === 0 &&
+                                    twist.angular.y === 0 &&
+                                    twist.angular.z === 0
+                                );
+                                updateStatus(moving);
                             }
                         } catch (e) {
                             console.error("Error parsing message:", e);
@@ -1222,15 +1231,10 @@ Window {
                     }
                 }
 
-                function updateStatus(status) {
-                    console.log("Status update:", status);
-                    if (status === false) {
-                        statusLabel.text = "Idle";
-                        statusLabel.color = "orange";
-                    } else if (status === true) {
-                        statusLabel.text = "Busy";
-                        statusLabel.color = "green";
-                    }
+                function updateStatus(isMoving) {
+                    console.log("Status update:", isMoving ? "Busy" : "Idle");
+                    statusLabel.text = isMoving ? "Busy" : "Idle";
+                    statusLabel.color = isMoving ? "red" : "orange";
                 }
             }
 
@@ -1498,6 +1502,7 @@ Window {
                         statusMessage.text = "ASLR is going to " + shelf + "...";
                         statusMessage.color = "green";
                         statusMessage.visible = true;
+                        statusTimer.start();
                     } else {
                         console.warn("Invalid shelf selected!");
                         statusMessage.text = "Please select a valid shelf.";
@@ -1562,6 +1567,7 @@ Window {
                         statusMessage.text = "Dropping the shelf at " + location + "...";
                         statusMessage.color = "green";
                         statusMessage.visible = true;
+                        statusTimer.start();
                     } else {
                         console.warn("Invalid location selected!");
                         statusMessage.text = "Please select a valid location.";
@@ -1689,6 +1695,7 @@ Window {
                     statusMessage.text = "ASLR Stopped!";
                     statusMessage.color = "red";
                     statusMessage.visible = true;
+                    statusTimer.start();
                 }
             }
         }
@@ -2089,7 +2096,7 @@ Window {
             anchors.topMargin: 20
             spacing: 10
 
-            //  Status Display
+            // Status Display
             Row {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -2112,31 +2119,42 @@ Window {
                 Connections {
                     target: rosConnector
 
-                    onMessageReceived: function(message) {
+                    function updateStatus(isMoving) {
+                        console.log("Status update:", isMoving ? "Busy" : "Idle");
+                        mstatusLabel.text = isMoving ? "Busy" : "Idle";
+                        mstatusLabel.color = isMoving ? "red" : "orange";
+                    }
+
+                    function handleVelocity(message) {
                         try {
-                            let data = JSON.parse(message);
-                            console.log("Received message for status:", data);
-                            if (data.topic === "/hoverboard/connected") {
-                                let status = data.msg.data;
-                                updateStatus(status);
-                            }
+                            let twist = JSON.parse(message);
+                            console.log("Received twist:", twist);
+
+                            let moving = !(
+                                twist.linear.x === 0 &&
+                                twist.linear.y === 0 &&
+                                twist.linear.z === 0 &&
+                                twist.angular.x === 0 &&
+                                twist.angular.y === 0 &&
+                                twist.angular.z === 0
+                            );
+                            updateStatus(moving);
                         } catch (e) {
-                            console.error("Error parsing message:", e);
+                            console.error("Error parsing twist:", e);
                         }
                     }
-                }
 
-                function updateStatus(status) {
-                    console.log("Status update:", status);
-                    if (status === false) {
-                        mstatusLabel.text = "Idle";
-                        mstatusLabel.color = "orange";
-                    } else if (status === true) {
-                        mstatusLabel.text = "Busy";
-                        mstatusLabel.color = "green";
+                    onCmdVelReceived: function(message) {
+                        handleVelocity(message);
+                    }
+
+                    onHoverboardCmdVelReceived: function(message) {
+                        handleVelocity(message);
                     }
                 }
             }
+
+
 
             // Battery Level Display
             Column {
@@ -2341,30 +2359,10 @@ Window {
                                         mstatusTimer.start();
                                         break;
 
-                                        case 16777232: // Numpad 7
-                                        console.log("Move North-West");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        mstatusMessage.text = "Moving NW...";
-                                        mstatusMessage.color = "green";
-                                        mstatusMessage.visible = true;
-                                        mstatusTimer.start();
-                                        break;
-
-                                        case 16777238: // Numpad 9
-                                        console.log("Move North-East");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        mstatusMessage.text = "Moving NE...";
-                                        mstatusMessage.color = "green";
-                                        mstatusMessage.visible = true;
-                                        mstatusTimer.start();
-                                        break;
-
                                         case 16777233: // Numpad 1
                                         console.log("Move South-West");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         mstatusMessage.text = "Moving SW...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2373,9 +2371,29 @@ Window {
 
                                         case 16777239: // Numpad 3
                                         console.log("Move South-East");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        mstatusMessage.text = "Moving SE...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
+                                        break;
+
+                                        case 16777232: // Numpad 7
+                                        console.log("Move North-West");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        mstatusMessage.text = "Moving NW...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
+                                        break;
+
+                                        case 16777238: // Numpad 9
+                                        console.log("Move North-East");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
                                         rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        mstatusMessage.text = "Moving SE...";
+                                        mstatusMessage.text = "Moving NE...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
@@ -2511,12 +2529,12 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Left");
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                            mstatusMessage.text = "Moving Left...";
-                            mstatusMessage.color = "green";
-                            mstatusMessage.visible = true;
-                            mstatusTimer.start();
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                mstatusMessage.text = "Moving Left...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
                             }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
@@ -2568,12 +2586,12 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Right");
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                            mstatusMessage.text = "Moving Right...";
-                            mstatusMessage.color = "green";
-                            mstatusMessage.visible = true;
-                            mstatusTimer.start();
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                mstatusMessage.text = "Moving Right...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
                             }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
@@ -2594,12 +2612,12 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move South-West");
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                            mstatusMessage.text = "Moving SW...";
-                            mstatusMessage.color = "green";
-                            mstatusMessage.visible = true;
-                            mstatusTimer.start();
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                mstatusMessage.text = "Moving SW...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
                             }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
@@ -2616,14 +2634,14 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Backward");
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                 mstatusMessage.text = "Moving Backward...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
                                 mstatusTimer.start();
                             }
-                            }
+                        }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
 
@@ -2638,12 +2656,12 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move South-East");
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                       rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                            mstatusMessage.text = "Moving SE...";
-                            mstatusMessage.color = "green";
-                            mstatusMessage.visible = true;
-                            mstatusTimer.start();
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                mstatusMessage.text = "Moving SE...";
+                                mstatusMessage.color = "green";
+                                mstatusMessage.visible = true;
+                                mstatusTimer.start();
                             }
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
@@ -2761,12 +2779,12 @@ Window {
                     onClicked: {
                         console.log("Lift Stop");
                         rosConnector.sendMessage(JSON.stringify({
-                            op: "publish",
-                            topic: "/linear_actuator_cmd",
-                            msg: {
-                                data: "x"
-                            }
-                        }));
+                                                                    op: "publish",
+                                                                    topic: "/linear_actuator_cmd",
+                                                                    msg: {
+                                                                        data: "x"
+                                                                    }
+                                                                }));
                         mstatusMessage.text = "Mechanism Stopped.";
                         mstatusMessage.color = "red";
                         mstatusMessage.visible = true;
