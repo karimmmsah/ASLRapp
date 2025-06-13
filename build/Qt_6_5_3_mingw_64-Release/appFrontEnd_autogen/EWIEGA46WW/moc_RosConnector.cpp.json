@@ -1,0 +1,210 @@
+{
+    "classes": [
+        {
+            "className": "RosConnector",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "connectToRos",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "goToChargingStation",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "message",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "sendMessage",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "x",
+                            "type": "double"
+                        },
+                        {
+                            "name": "y",
+                            "type": "double"
+                        }
+                    ],
+                    "name": "sendGoal",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "ip",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "setRosIp",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 0,
+                    "name": "isConnected",
+                    "notify": "connectionStatusChanged",
+                    "read": "isConnected",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false
+                }
+            ],
+            "qualifiedClassName": "RosConnector",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "connectedToRos",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "connectionFailed",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "connectionStatusChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "poseReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "mapReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "globalPathReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "localPathReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "goalReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "json",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "costmapReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "twistJson",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "cmdVelReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "twistJson",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "hoverboardCmdVelReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "voltageJson",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "batteryVoltageReceived",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "private",
+                    "name": "onConnected",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "name": "onDisconnected",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "RosConnector.h",
+    "outputRevision": 68
+}

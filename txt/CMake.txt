@@ -49,7 +49,6 @@ target_link_libraries(appFrontEnd PRIVATE
 )
 
 set_target_properties(appFrontEnd PROPERTIES
-    MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
 

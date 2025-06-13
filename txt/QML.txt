@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtMultimedia
+import Qt.labs.settings 1.1
 
 // Main
 Window {
@@ -207,14 +208,14 @@ Window {
                     id: ipInput
                     placeholderText: "Enter ROS IP"
                     text: "192.168.1.X"
-                    width: 180
+                    width: 140
                     height: 35
                     font.pointSize: 14
                     padding: 10
                     color: "black"
 
                     background: Rectangle {
-                        color: "#F0F0F0"
+                        color: "#FFFFFF"
                         radius: 8
                         border.color: "#A0A0A0"
                         border.width: 1
@@ -568,6 +569,7 @@ Window {
         // Credentials
         Column {
             anchors.centerIn: parent
+            anchors.verticalCenterOffset: 50
             spacing: 20
 
             // Username Field
@@ -675,6 +677,39 @@ Window {
                         } else {
                             authManager.loginUser(emailField.text, passwordField.text);
                         }
+                    }
+                }
+            }
+
+            // Add User
+            Button {
+                id: webButton
+                text: "ADD USER"
+                width: 155
+                height: 45
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                background: Rectangle {
+                    color: "#4CAF50"
+                    radius: 10
+                }
+
+                contentItem: Text {
+                    text: parent.text
+                    font.pixelSize: 20
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.family: "Tahoma"
+                    font.bold: true
+                    color: "white"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        Qt.openUrlExternally("https://console.firebase.google.com/u/0/project/aslr-asu/authentication/users");
                     }
                 }
             }
@@ -991,6 +1026,137 @@ Window {
                         }
                     }
                 }
+            }
+        }
+
+        // Upload Map
+        Button {
+            text: "Map"
+            width: 140
+            height: 35
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 300
+
+            background: Rectangle {
+                color: "#2196F3"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 18
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Tahoma"
+                font.bold: true
+                color: "white"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: mapDialog.open()
+            }
+        }
+
+        FileDialog {
+            id: mapDialog
+            title: "Select a Map Image"
+            nameFilters: ["Image files (*.png *.jpg *.bmp)"]
+            onAccepted: {
+                var selected = mapDialog.selectedFile
+                mapImage.source = selected
+                mmapImage.source = selected
+
+                settings.setValue("LastMap", selected)
+                console.log("Saved map path:", selected)
+            }
+        }
+
+        // Coordinates
+        Button {
+            text: "Coordinates"
+            width: 140
+            height: 35
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 250
+
+            background: Rectangle {
+                color: "#4CAF50"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 18
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Tahoma"
+                font.bold: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: csvDialog.open()
+            }
+        }
+
+        FileDialog {
+            id: csvDialog
+            title: "Select CSV File with Coordinates"
+            nameFilters: ["CSV files (*.csv)"]
+            onAccepted: {
+                console.log("CSV selected:", csvDialog.selectedFile)
+                coordinateLoader.loadFromCsv(csvDialog.selectedFile)
+            }
+        }
+        QtObject {
+            id: coordinateLoader
+
+            function loadFromCsv(filePath) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", filePath, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE && (xhr.status === 200 || xhr.status === 0)) {
+                        coordinateLoader.parseCSVAndSetGoals(xhr.responseText);
+                    }
+                }
+                xhr.send();
+            }
+
+            function parseCSVAndSetGoals(csvContent) {
+                var lines = csvContent.trim().split("\n");
+                var newGoals = {};
+                var coordKeys = [];
+
+                for (var i = 1; i < lines.length; i++) {
+                    var parts = lines[i].split(",");
+                    if (parts.length < 3) continue;
+
+                    var name = parts[0].trim();
+                    var x = parseFloat(parts[1]);
+                    var y = parseFloat(parts[2]);
+
+                    if (!isNaN(x) && !isNaN(y)) {
+                        newGoals[name] = { x: x, y: y };
+                        coordSettings.setValue("Coord_" + name, JSON.stringify({ x: x, y: y }));
+                        coordKeys.push(name);
+                        console.log("Loaded coordinate for", name, "→", x, y);
+                    }
+                }
+
+                coordSettings.setValue("Coord_Keys", coordKeys.join(";"));
+
+                cameraMapRow.goalCoordinates = newGoals;
+                cameraMapRow.shelfKeys = Object.keys(newGoals).filter(n => n.startsWith("Shelf"));
+                cameraMapRow.locationKeys = Object.keys(newGoals).filter(n => n.startsWith("Location"));
+                shelfDropdown.model = cameraMapRow.shelfKeys;
+                locationDropdown.model = cameraMapRow.locationKeys;
             }
         }
 
@@ -1365,16 +1531,6 @@ Window {
             anchors.rightMargin: 80
             spacing: 80
 
-            property var goalCoordinates: {
-                "Shelf A": { x: 2.46 , y: -0.47 },
-                "Shelf B": { x: 0, y: 0 },
-                "Shelf C": { x: 2.51197 , y: -4.50967 },
-                "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                "Location 1": { x: 1.5 , y: 1 },
-                "Location 2": { x: 13.2928 , y: -5.59084 },
-                "Location 3": { x: 10.8946 , y: -6.70115 },
-            }
-
             // Pick
             Column {
                 spacing: 10
@@ -1392,7 +1548,7 @@ Window {
                     id: shelfDropdown
                     width: 180
                     height: 40
-                    model: ["", "Shelf A", "Shelf B", "Shelf C" , "Shelf D"]
+                    model: cameraMapRow.shelfKeys
                     currentIndex: -1
 
                     background: Rectangle {
@@ -1438,7 +1594,7 @@ Window {
                     id: locationDropdown
                     width: 180
                     height: 40
-                    model: ["", "Location 1", "Location 2", "Location 3"]
+                    model: cameraMapRow.locationKeys
 
                     background: Rectangle {
                         color: "#DBE2E9"
@@ -1498,21 +1654,12 @@ Window {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                property var goalCoordinates: {
-                    "Shelf A": { x: 2.46 , y: -0.47 },
-                    "Shelf B": { x: 0, y: 0 },
-                    "Shelf C": { x: 2.51197 , y: -4.50967 },
-                    "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 1.5 , y: 1 },
-                    "Location 2": { x: 13.2928 , y: -5.59084 },
-                    "Location 3": { x: 10.8946 , y: -6.70115 },
-                }
                 onClicked: {
                     console.log("Selected Shelf: " + shelfDropdown.currentText);
                     console.log("Selected Location: " + locationDropdown.currentText);
 
                     var shelf = shelfDropdown.currentText;
-                    var goal = goalCoordinates[shelf];
+                    var goal = cameraMapRow.goalCoordinates[shelf];
 
                     if (goal) {
                         console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
@@ -1563,21 +1710,12 @@ Window {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                property var goalCoordinates: {
-                    "Shelf A": { x: 2.47 , y: -0.47},
-                    "Shelf B": { x: 0, y: 0},
-                    "Shelf C": { x: 2.51197 , y: -4.50967 },
-                    "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 1.5 , y: 1 },
-                    "Location 2": { x: 13.2928 , y: -5.59084 },
-                    "Location 3": { x: 10.8946 , y: -6.70115 },
-                }
                 onClicked: {
                     console.log("Selected Shelf: " + shelfDropdown.currentText);
                     console.log("Selected Location: " + locationDropdown.currentText);
 
                     var location = locationDropdown.currentText;
-                    var goal = goalCoordinates[location];
+                    var goal = cameraMapRow.goalCoordinates[location];
 
                     if (goal) {
                         console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
@@ -1720,12 +1858,61 @@ Window {
         }
 
         // Digital Twin
+        Settings {
+            id: settings
+            category: "Map"
+        }
+
+        Settings {
+            id: coordSettings
+            category: "Coordinates"
+        }
+
+        Component.onCompleted: {
+            // Load saved map
+            var lastMap = settings.value("LastMap", "")
+            if (lastMap !== "") {
+                mapImage.source = lastMap
+                mmapImage.source = lastMap
+                console.log("Loaded saved map:", lastMap)
+            } else {
+                console.log("No saved map found.")
+            }
+
+            // Load saved coordinates
+            var keysString = coordSettings.value("Coord_Keys", "");
+            if (keysString !== "") {
+                var keyList = keysString.split(";");
+                var allGoals = {};
+                for (var i = 0; i < keyList.length; i++) {
+                    var name = keyList[i];
+                    var json = coordSettings.value("Coord_" + name, "");
+                    if (json !== "") {
+                        var obj = JSON.parse(json);
+                        allGoals[name] = obj;
+                        console.log("Restored coordinate:", name, "→", obj.x, obj.y);
+                    }
+                }
+
+                cameraMapRow.goalCoordinates = allGoals;
+                cameraMapRow.shelfKeys = Object.keys(allGoals).filter(n => n.startsWith("Shelf"));
+                cameraMapRow.locationKeys = Object.keys(allGoals).filter(n => n.startsWith("Location"));
+                shelfDropdown.model = cameraMapRow.shelfKeys;
+                locationDropdown.model = cameraMapRow.locationKeys;
+            } else {
+                console.log("No saved coordinates found.");
+            }
+        }
+
         Row {
             id: cameraMapRow
             property real mapScalex: 59
             property real mapScaley: 48
             property real mapWidth: digitalTwinMap.width
             property real mapHeight: digitalTwinMap.height
+            property var goalCoordinates: ({})
+            property var shelfKeys: []
+            property var locationKeys: []
 
             // Initial pixel anchor
             property real initialPixelX: 50
@@ -1756,16 +1943,18 @@ Window {
             anchors.rightMargin: 100
             spacing: 30
 
+            property string currentMap: settings.lastMap
+
             Rectangle {
                 id: digitalTwinMap
                 width: 900
                 height: 450
-                color: "#f0f0f0"
+                color: "#ffffff"
 
                 Image {
                     id: mapImage
                     anchors.fill: parent
-                    source: "qrc:/Images/map_with_shelves.png"
+                    source: currentMap
                 }
 
                 // Global path canvas
@@ -1803,6 +1992,16 @@ Window {
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
+                    MouseArea {
+                        anchors.fill: parent
+                        drag.target: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onReleased: {
+                            cameraMapRow.robotX = parent.x + parent.width / 2;
+                            cameraMapRow.robotY = parent.y + parent.height / 2;
+                            console.log("Robot manually moved to:", cameraMapRow.robotX, cameraMapRow.robotY);
+                        }
+                    }
                 }
 
                 // Goal marker
@@ -2850,12 +3049,12 @@ Window {
                 id: mdigitalTwinMap
                 width: 900
                 height: 450
-                color: "#f0f0f0"
+                color: "#ffffff"
 
                 Image {
                     id: mmapImage
                     anchors.fill: parent
-                    source: "qrc:/Images/map_with_shelves.png"
+                    source: currentMap
                 }
 
                 // Global path canvas
@@ -2893,6 +3092,16 @@ Window {
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
+                    MouseArea {
+                        anchors.fill: parent
+                        drag.target: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onReleased: {
+                            cameraMapRow.robotX = parent.x + parent.width / 2;
+                            cameraMapRow.robotY = parent.y + parent.height / 2;
+                            console.log("Robot manually moved to:", cameraMapRow.robotX, cameraMapRow.robotY);
+                        }
+                    }
                 }
 
                 // Goal marker

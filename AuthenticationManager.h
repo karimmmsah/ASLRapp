@@ -1,6 +1,8 @@
 #ifndef AUTHENTICATIONMANAGER_H
 #define AUTHENTICATIONMANAGER_H
 
+#define FIREBASE_API_KEY "AIzaSyA-Bf9fFQy9qev11pzQRt3CVd_VpVCsbkM"
+
 #include <QObject>
 #include <QString>
 #include <QNetworkAccessManager>

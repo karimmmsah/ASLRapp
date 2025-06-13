@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/ASU.png</file>
+        <file>Images/Icon.png</file>
+        <file>Images/robot_icon.png</file>
+        <file>Main.qml</file>
+        <file>Images/1.png</file>
+        <file>Images/LiftRobot.png</file>
+        <file>Images/Logo.png</file>
+        <file>Images/flag.png</file>
+        <file>Images/map_with_shelves.png</file>
+        <file>Images/final_map.png</file>
+    </qresource>
+</RCC>

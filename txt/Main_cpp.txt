@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("ASU");
     QCoreApplication::setApplicationName("ASLR");
 
+    qputenv("QML_XHR_ALLOW_FILE_READ", QByteArray("1"));
+
     QQmlApplicationEngine engine;
 
     AuthenticationManager authManager;

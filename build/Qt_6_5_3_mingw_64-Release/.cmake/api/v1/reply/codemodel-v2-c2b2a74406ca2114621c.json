@@ -1,0 +1,169 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-1422fb0df1ea5e4deaf0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "FrontEnd",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint-Release-550e2e62f76eb655cf12.json",
+					"name" : "all_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_json-Release-a5f8c0f87258e51681b2.json",
+					"name" : "all_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_module-Release-ab3bcefaba294a28b371.json",
+					"name" : "all_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmltyperegistrations::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmltyperegistrations-Release-817979ad716086597e58.json",
+					"name" : "all_qmltyperegistrations",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd-Release-b5bac049861dd1c66119.json",
+					"name" : "appFrontEnd",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_autogen-Release-6424c7e389dfb434b9b5.json",
+					"name" : "appFrontEnd_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_autogen_timestamp_deps-Release-a26cf6437e1fa90bccee.json",
+					"name" : "appFrontEnd_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_qmlimportscan::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_qmlimportscan-Release-64c796428a565c669617.json",
+					"name" : "appFrontEnd_qmlimportscan",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_qmllint-Release-d8c9d850d3e2c04c3926.json",
+					"name" : "appFrontEnd_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_qmllint_json-Release-c328163b42a0b9d0aabe.json",
+					"name" : "appFrontEnd_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_qmllint_module-Release-77f8a90c8005957dedef.json",
+					"name" : "appFrontEnd_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_qmltyperegistration::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_qmltyperegistration-Release-fe8584a269f677244d4e.json",
+					"name" : "appFrontEnd_qmltyperegistration",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appFrontEnd_tooling::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appFrontEnd_tooling-Release-b297a7113f43fb073079.json",
+					"name" : "appFrontEnd_tooling",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/HP/Documents/Qt/FrontEnd/build/Qt_6_5_3_mingw_64-Release",
+		"source" : "C:/Users/HP/Documents/Qt/FrontEnd"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

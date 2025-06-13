@@ -7,11 +7,10 @@
 AuthenticationManager::AuthenticationManager(QObject *parent) : QObject(parent) {
     networkManager = new QNetworkAccessManager(this);
 
-    QSettings settings("config.ini", QSettings::IniFormat);
-    firebaseApiKey = settings.value("Firebase/API_KEY").toString();
+    firebaseApiKey = FIREBASE_API_KEY;
 
     if (firebaseApiKey.isEmpty()) {
-        qWarning() << "API Key is missing! Please check config.ini";
+        qWarning() << "API Key is missing!";
     }
 }
 
