@@ -12,17 +12,17 @@ Window {
     visibility: Window.FullScreen
     title: qsTr("ASLR Control Panel")
     color: "#ffffff"
-    
+
     // Cursor
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.ArrowCursor
     }
-    
+
     // Splash Screen
     property bool splashDone: false
-    
+
     //Overlay
     Rectangle {
         id: splashScreen
@@ -30,7 +30,7 @@ Window {
         color: "#ffffff"
         visible: !main.splashDone
         z: 1000
-        
+
         Image {
             id: splashImage
             source: "qrc:/Images/1.png"
@@ -40,14 +40,14 @@ Window {
             fillMode: Image.PreserveAspectFit
             opacity: 1.0
         }
-        
+
         Timer {
             interval: 2500
             running: true
             repeat: false
             onTriggered: fadeOutAnim.start()
         }
-        
+
         SequentialAnimation {
             id: fadeOutAnim
             PropertyAnimation {
@@ -66,13 +66,13 @@ Window {
             }
         }
     }
-    
+
     // Connect Page
     Item {
         id: connectPage
         anchors.fill: parent
         visible: true
-        
+
         // Time & Date Display
         Item {
             id: timeDateContainer
@@ -80,10 +80,10 @@ Window {
             anchors.right: parent.right
             anchors.topMargin: 20
             anchors.rightMargin: 20
-            
+
             property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
             property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
-            
+
             Timer {
                 interval: 1000
                 running: true
@@ -93,25 +93,25 @@ Window {
                     timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
                 }
             }
-            
+
             Rectangle {
                 x: -195
                 y: 0
                 width: 250
                 height: 70
                 color: "#ffffff"
-                
+
                 Column {
                     anchors.centerIn: parent
                     spacing: 2
-                    
+
                     Text {
                         text: timeDateContainer.currentDate
                         font.pixelSize: 16
                         font.bold: true
                         color: "#333333"
                     }
-                    
+
                     Text {
                         text: timeDateContainer.currentTime
                         font.pixelSize: 20
@@ -121,7 +121,7 @@ Window {
                 }
             }
         }
-        
+
         // Background Image
         Image {
             id: background
@@ -179,18 +179,49 @@ Window {
             }
             // Decorations
             Rectangle {
-                x: 856
-                width: 2000
+                width: parent.width
                 height: 62
                 opacity: 0.9
                 color: "#ff9a00"
-                anchors.right: parent.right
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                anchors.rightMargin: -2
-                anchors.topMargin: 760
+                anchors.topMargin: 855
                 z: -22
             }
-            
+
+            // IP Address Assign
+            Column {
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
+                anchors.margins: 16
+                spacing: 4
+
+                Label {
+                    text: "IP Address"
+                    color: "black"
+                    font.bold: true
+                    font.pointSize: 12
+                }
+
+                TextField {
+                    id: ipInput
+                    placeholderText: "Enter ROS IP"
+                    text: "192.168.1.X"
+                    width: 180
+                    height: 35
+                    font.pointSize: 14
+                    padding: 10
+                    color: "black"
+
+                    background: Rectangle {
+                        color: "#F0F0F0"
+                        radius: 8
+                        border.color: "#A0A0A0"
+                        border.width: 1
+                    }
+                }
+            }
+
             // Connect Button
             Button {
                 id: connectButton
@@ -201,12 +232,12 @@ Window {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: 22
-                
+
                 background: Rectangle {
                     color: rosConnector.isConnected ? "#33dc23" : "#ff9a00"
                     radius: 10
                 }
-                
+
                 contentItem: Text {
                     font.pixelSize: 20
                     horizontalAlignment: Text.AlignHCenter
@@ -215,53 +246,54 @@ Window {
                     color: "white"
                     text: rosConnector.isConnected ? "CONNECTED" : "CONNECT"
                 }
-                
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        rosConnector.setRosIp(ipInput.text)
                         rosConnector.connectToRos();
                     }
                 }
-                
+
                 Keys.onReturnPressed: rosConnector.connectToRos()
                 Keys.onEnterPressed: rosConnector.connectToRos()
-                
+
                 Connections {
                     target: rosConnector
-                    
+
                     function onConnectedToRos() {
                         connectPage.visible = false;
                         loginPage.visible = true;
                     }
-                    
+
                     function onConnectionFailed() {
                         connectionErrorDialog.open();
                     }
                 }
             }
-            
+
             // Connection Error Dialog
             Dialog {
                 id: connectionErrorDialog
                 modal: true
                 width: 360
                 height: 160
-                
+
                 x: (parent.width - width) / 2
                 y: (parent.height - height) / 1.85
-                
+
                 background: Rectangle {
                     color: "#F8F9FA"
                     radius: 10
                 }
-                
+
                 contentItem: Column {
                     spacing: 25
                     anchors.fill: parent
                     anchors.margins: 30
-                    
+
                     Label {
                         text: "Connection failed.\nPlease connect your ASLR to the network."
                         font.pixelSize: 16
@@ -271,21 +303,21 @@ Window {
                         wrapMode: Text.WordWrap
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
-                    
+
                     Row {
                         spacing: 20
                         anchors.horizontalCenter: parent.horizontalCenter
-                        
+
                         Button {
                             text: "OK"
                             width: 80
                             height: 40
-                            
+
                             background: Rectangle {
                                 color: "#E0E0E0"
                                 radius: 10
                             }
-                            
+
                             contentItem: Text {
                                 text: "OK"
                                 font.pixelSize: 16
@@ -294,20 +326,20 @@ Window {
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
-                            
+
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: connectionErrorDialog.close()
                             }
-                            
+
                             Keys.onReturnPressed: connectionErrorDialog.close()
                         }
                     }
                 }
             }
-            
+
             // Exit Button
             Button {
                 id: exitButton
@@ -318,12 +350,12 @@ Window {
                 anchors.top: connectButton.bottom
                 anchors.topMargin: 20
                 font.pixelSize: 22
-                
+
                 background: Rectangle {
                     color: "#D32F2F"
                     radius: 10
                 }
-                
+
                 contentItem: Text {
                     font.pixelSize: 20
                     horizontalAlignment: Text.AlignHCenter
@@ -337,7 +369,7 @@ Window {
                     text: "EXIT"
                     anchors.fill: parent
                 }
-                
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -345,7 +377,7 @@ Window {
                     onClicked: exitDialog.open()
                 }
             }
-            
+
             // Exit Confirmation Dialog
             Dialog {
                 id: exitDialog
@@ -356,15 +388,15 @@ Window {
                     color: "#F8F9FA"
                     radius: 10
                 }
-                
+
                 x: (parent.width - width) / 2
                 y: (parent.height - height) / 1.85
-                
+
                 contentItem: Column {
                     spacing: 25
                     anchors.fill: parent
                     anchors.margins: 30
-                    
+
                     Label {
                         text: "Are you sure you want to exit?"
                         font.pixelSize: 16
@@ -373,7 +405,7 @@ Window {
                         horizontalAlignment: Qt.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
-                    
+
                     Row {
                         spacing: 20
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -393,7 +425,7 @@ Window {
                                 onClicked: exitDialog.close()
                             }
                         }
-                        
+
                         Button {
                             text: "Exit"
                             width: 80
@@ -430,17 +462,17 @@ Window {
         id: loginPage
         anchors.fill: parent
         visible: false
-        
+
         // Time & Date Display
         Item {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 20
             anchors.rightMargin: 20
-            
+
             property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
             property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
-            
+
             Timer {
                 interval: 1000
                 running: true
@@ -450,25 +482,25 @@ Window {
                     timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
                 }
             }
-            
+
             Rectangle {
                 x: -195
                 y: 0
                 width: 250
                 height: 70
                 color: "#ffffff"
-                
+
                 Column {
                     anchors.centerIn: parent
                     spacing: 2
-                    
+
                     Text {
                         text: timeDateContainer.currentDate
                         font.pixelSize: 16
                         font.bold: true
                         color: "#333333"
                     }
-                    
+
                     Text {
                         text: timeDateContainer.currentTime
                         font.pixelSize: 20
@@ -478,7 +510,7 @@ Window {
                 }
             }
         }
-        
+
         // Title
         Text {
             x: 240
@@ -523,23 +555,21 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
+            width: parent.width
             height: 62
             opacity: 0.9
             color: "#3E424B"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
-        
+
         // Credentials
         Column {
             anchors.centerIn: parent
             spacing: 20
-            
+
             // Username Field
             Rectangle {
                 width: 280
@@ -549,7 +579,7 @@ Window {
                 border.color: "#CCCCCC"
                 border.width: 2
                 clip: true
-                
+
                 TextField {
                     id: emailField
                     width: parent.width - 20
@@ -574,7 +604,7 @@ Window {
                     }
                 }
             }
-            
+
             // Password Field
             Rectangle {
                 width: 280
@@ -584,7 +614,7 @@ Window {
                 border.color: "#CCCCCC"
                 border.width: 2
                 clip: true
-                
+
                 TextField {
                     id: passwordField
                     width: parent.width - 20
@@ -610,7 +640,7 @@ Window {
                     }
                 }
             }
-            
+
             // Login Button
             Button {
                 id: loginButton
@@ -618,12 +648,12 @@ Window {
                 width: 155
                 height: 45
                 anchors.horizontalCenter: parent.horizontalCenter
-                
+
                 background: Rectangle {
                     color: "#2196F3"
                     radius: 10
                 }
-                
+
                 contentItem: Text {
                     text: parent.text
                     font.pixelSize: 22
@@ -633,7 +663,7 @@ Window {
                     font.bold: true
                     color: "white"
                 }
-                
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -649,22 +679,22 @@ Window {
                 }
             }
         }
-        
+
         // Success and Error Handling
         Connections {
             target: authManager
-            
+
             onLoginSuccess: {
                 loginPage.visible = false;
                 selectionPage.visible = true;
             }
-            
+
             onLoginFailed: (errorMessage) => {
                                loginerrorDialog.open();
                                okButton.focus = true;
                            }
         }
-        
+
         // Error Dialog
         Dialog {
             id: loginerrorDialog
@@ -675,15 +705,15 @@ Window {
                 color: "#F8F9FA"
                 radius: 10
             }
-            
+
             x: (parent.width - width) / 2
             y: (parent.height - height) / 1.85
-            
+
             contentItem: Column {
                 spacing: 25
                 anchors.fill: parent
                 anchors.margins: 30
-                
+
                 Label {
                     id: errorMessageLabel
                     text: "Invalid username or password.\nPlease try again."
@@ -694,12 +724,12 @@ Window {
                     wrapMode: Text.WordWrap
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
-                
+
                 Row {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.topMargin: 50
-                    
+
                     Button {
                         id: okButton
                         text: "OK"
@@ -735,7 +765,7 @@ Window {
                 }
             }
         }
-        
+
         // Back Button
         Button {
             text: "Back"
@@ -749,12 +779,12 @@ Window {
             font.pointSize: 10
             font.family: "Tahoma"
             display: AbstractButton.TextOnly
-            
+
             background: Rectangle {
                 color: "#D32F2F"
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: parent.text
                 font.pixelSize: 18
@@ -764,7 +794,7 @@ Window {
                 color: "white"
                 anchors.centerIn: parent
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -782,17 +812,17 @@ Window {
         id: selectionPage
         anchors.fill: parent
         visible: false
-        
+
         // Time & Date Display
         Item {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 20
             anchors.rightMargin: 20
-            
+
             property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
             property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
-            
+
             Timer {
                 interval: 1000
                 running: true
@@ -802,25 +832,25 @@ Window {
                     timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
                 }
             }
-            
+
             Rectangle {
                 x: -195
                 y: 0
                 width: 250
                 height: 70
                 color: "#ffffff"
-                
+
                 Column {
                     anchors.centerIn: parent
                     spacing: 2
-                    
+
                     Text {
                         text: timeDateContainer.currentDate
                         font.pixelSize: 16
                         font.bold: true
                         color: "#333333"
                     }
-                    
+
                     Text {
                         text: timeDateContainer.currentTime
                         font.pixelSize: 20
@@ -830,7 +860,7 @@ Window {
                 }
             }
         }
-        
+
         // Title
         Text {
             x: 240
@@ -875,47 +905,43 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
+            width: parent.width
             height: 62
             opacity: 0.9
             color: "#2196F3"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
-        
+
         // Toggle
         Item {
             anchors.centerIn: parent
-            
+
             ColumnLayout {
                 anchors.centerIn: parent
                 spacing: 20
-                
+
                 Rectangle {
                     id: controlToggle
                     width: 320
                     height: 60
                     radius: 30
                     color: "#DBE2E9"
-                    
+
                     property bool isAutomatic: true
-                    
+
                     RowLayout {
                         anchors.fill: parent
                         spacing: 0
-                        
+
                         Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: controlToggle.radius
-                            color: autonomousMouseArea.containsMouse ? "#2196F3"
-                                                                     : "#DBE2E9"
-                            
-                            
+                            color: autonomousMouseArea.containsMouse ? "#2196F3" : "#DBE2E9"
+
                             Text {
                                 text: "AUTONOMOUS"
                                 font.pixelSize: 18
@@ -923,7 +949,7 @@ Window {
                                 color: autonomousMouseArea.containsMouse ? "white" : "black"
                                 anchors.centerIn: parent
                             }
-                            
+
                             MouseArea {
                                 id: autonomousMouseArea
                                 anchors.fill: parent
@@ -936,14 +962,13 @@ Window {
                                 }
                             }
                         }
-                        
+
                         Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: controlToggle.radius
-                            color: manualMouseArea.containsMouse ? "#2196F3"
-                                                                 : "#DBE2E9"
-                            
+                            color: manualMouseArea.containsMouse ? "#2196F3" : "#DBE2E9"
+
                             Text {
                                 text: "MANUAL"
                                 font.pixelSize: 18
@@ -951,7 +976,7 @@ Window {
                                 color: manualMouseArea.containsMouse ? "white" : "black"
                                 anchors.centerIn: parent
                             }
-                            
+
                             MouseArea {
                                 id: manualMouseArea
                                 anchors.fill: parent
@@ -968,7 +993,7 @@ Window {
                 }
             }
         }
-        
+
         // Sign Out Button
         Button {
             text: "Sign Out"
@@ -982,12 +1007,12 @@ Window {
             font.pointSize: 10
             font.family: "Tahoma"
             display: AbstractButton.TextOnly
-            
+
             background: Rectangle {
                 color: "#D32F2F"
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: parent.text
                 font.pixelSize: 18
@@ -997,7 +1022,7 @@ Window {
                 color: "white"
                 anchors.centerIn: parent
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -1018,17 +1043,17 @@ Window {
         id: automaticControlPage
         anchors.fill: parent
         visible: false
-        
+
         // Time & Date Display
         Item {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 20
             anchors.rightMargin: 20
-            
+
             property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
             property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
-            
+
             Timer {
                 interval: 1000
                 running: true
@@ -1038,25 +1063,25 @@ Window {
                     timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
                 }
             }
-            
+
             Rectangle {
                 x: -195
                 y: 0
                 width: 250
                 height: 70
                 color: "#ffffff"
-                
+
                 Column {
                     anchors.centerIn: parent
                     spacing: 2
-                    
+
                     Text {
                         text: timeDateContainer.currentDate
                         font.pixelSize: 16
                         font.bold: true
                         color: "#333333"
                     }
-                    
+
                     Text {
                         text: timeDateContainer.currentTime
                         font.pixelSize: 20
@@ -1066,7 +1091,7 @@ Window {
                 }
             }
         }
-        
+
         // Title
         Text {
             x: 240
@@ -1111,92 +1136,90 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
-            height: 60
+            width: parent.width
+            height: 62
             opacity: 0.9
             color: "#18C519"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
+        // Top-right Rectangle and Text: "Pick & Drop"
         Rectangle {
-            x: 1100
-            y: 100
             width: 266
             height: 55
             opacity: 0.7
             color: "#525ed4"
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 100
+            anchors.rightMargin: 0
             z: -22
         }
+
         Text {
-            x: 1142
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Pick & Drop")
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 120
-            anchors.topMargin: 108
+            color: "#f8f9fA"
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
-            font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 112
+            anchors.rightMargin: 100
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
+
+        // Left-side Rectangle and Text: "Warehouse Map"
         Rectangle {
-            x: 0
-            y: 160
             width: 266
             height: 55
             opacity: 0.7
             color: "#525ed4"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 160
+            anchors.leftMargin: 0
             z: 22
         }
+
         Text {
-            x: 2
-            z: 23
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Warehouse Map")
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.leftMargin: 108
-            anchors.topMargin: 167
+            color: "#f8f9fA"
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
-            font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 172
+            anchors.leftMargin: 50
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            z: 23
         }
-        
+
+
         // Status & Battery Display
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 20
             spacing: 10
-            
+
             // Status Display
             Row {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                
+
                 Label {
                     text: "Status:"
                     font.pointSize: 16
                     font.bold: true
                     color: "black"
                 }
-                
+
                 Label {
                     id: statusLabel
                     text: "Idle"
@@ -1204,106 +1227,105 @@ Window {
                     font.bold: true
                     color: "orange"
                 }
-                
+
                 Connections {
                     target: rosConnector
-                    
-                    onMessageReceived: function(message) {
+
+                    function updateStatus(isMoving) {
+                        console.log("Status update:", isMoving ? "Busy" : "Idle");
+                        statusLabel.text = isMoving ? "Busy" : "Idle";
+                        statusLabel.color = isMoving ? "red" : "orange";
+                    }
+
+                    function handleVelocity(message) {
                         try {
-                            let data = JSON.parse(message);
-                            console.log("Received message for status:", data);
-                            if (data.topic === "/hoverboard/connected") {
-                                let status = data.msg.data;
-                                updateStatus(status);
-                            }
+                            let twist = JSON.parse(message);
+                            console.log("Received twist:", twist);
+
+                            let moving = !(
+                                    twist.linear.x === 0 &&
+                                    twist.linear.y === 0 &&
+                                    twist.linear.z === 0 &&
+                                    twist.angular.x === 0 &&
+                                    twist.angular.y === 0 &&
+                                    twist.angular.z === 0
+                                    );
+                            updateStatus(moving);
                         } catch (e) {
-                            console.error("Error parsing message:", e);
+                            console.error("Error parsing twist:", e);
                         }
                     }
-                }
-                
-                function updateStatus(status) {
-                    console.log("Status update:", status);
-                    if (status === false) {
-                        statusLabel.text = "Idle";
-                        statusLabel.color = "orange";
-                    } else if (status === true) {
-                        statusLabel.text = "Busy";
-                        statusLabel.color = "green";
+
+                    onCmdVelReceived: function(message) {
+                        handleVelocity(message);
+                    }
+
+                    onHoverboardCmdVelReceived: function(message) {
+                        handleVelocity(message);
                     }
                 }
             }
-            
+
             // Battery Level Display
             Column {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                
+
                 Row {
                     spacing: 5
                     anchors.horizontalCenter: parent.horizontalCenter
-                    
+
                     Label {
                         text: "Battery:"
                         font.pointSize: 14
                         font.bold: true
                         color: "black"
                     }
-                    
+
                     Label {
                         id: batteryPercentageLabel
                         text: " 0%"
                         font.pointSize: 14
                         font.bold: true
                     }
-                    
-                    Timer {
-                        id: batterySubscribeTimer
-                        interval: 1000
-                        running: true
-                        repeat: true
-                    }
-                    
+
                     Connections {
                         target: rosConnector
-                        
-                        onMessageReceived: function(message) {
+
+                        onBatteryVoltageReceived: function(voltageJson) {
                             try {
-                                let data = JSON.parse(message);
-                                console.log("Received battery message:", data);
-                                if (data.topic === "/hoverboard/battery_voltage") {
-                                    let voltage = data.msg.data;
-                                    
-                                    let percentage = ((voltage - 33) / (42 - 33)) * 100;
-                                    percentage = Math.min(100, Math.max(0, percentage));
-                                    
-                                    batteryPercentageLabel.text = Math.round(percentage) + "%";
-                                    batteryBar.width = 200 * (percentage / 100);
-                                    
-                                    if (percentage > 60) {
-                                        batteryPercentageLabel.color = "green";
-                                        batteryBar.color = "green";
-                                    } else if (percentage > 30) {
-                                        batteryPercentageLabel.color = "orange";
-                                        batteryBar.color = "orange";
-                                    } else {
-                                        batteryPercentageLabel.color = "red";
-                                        batteryBar.color = "red";
-                                    }
+                                let data = JSON.parse(voltageJson);
+                                let voltage = data.data;
+
+                                let percentage = ((voltage - 33) / (42 - 33)) * 100;
+                                percentage = Math.min(100, Math.max(0, percentage));
+
+                                batteryPercentageLabel.text = Math.round(percentage) + "%";
+                                batteryBar.width = 200 * (percentage / 100);
+
+                                if (percentage > 60) {
+                                    batteryPercentageLabel.color = "green";
+                                    batteryBar.color = "green";
+                                } else if (percentage > 30) {
+                                    batteryPercentageLabel.color = "orange";
+                                    batteryBar.color = "orange";
+                                } else {
+                                    batteryPercentageLabel.color = "red";
+                                    batteryBar.color = "red";
                                 }
                             } catch (e) {
-                                console.log("Battery message parse error:", e);
+                                console.log("Voltage JSON parse error:", e);
                             }
                         }
                     }
                 }
-                
+
                 Rectangle {
                     width: 200
                     height: 15
                     radius: 5
                     color: "#E0E0E0"
-                    
+
                     Rectangle {
                         id: batteryBar
                         height: parent.height
@@ -1312,7 +1334,7 @@ Window {
                 }
             }
         }
-        
+
         // Notification
         Text {
             id: statusMessage
@@ -1326,7 +1348,7 @@ Window {
             visible: false
             text: " "
         }
-        
+
         Timer {
             id: statusTimer
             interval: 5000
@@ -1334,7 +1356,7 @@ Window {
             repeat: false
             onTriggered: statusMessage.visible = false
         }
-        
+
         // Pick & Drop
         Column {
             anchors.top: parent.top
@@ -1342,21 +1364,21 @@ Window {
             anchors.topMargin: 190
             anchors.rightMargin: 80
             spacing: 80
-            
+
             property var goalCoordinates: {
-                "Shelf A": { x: 8.47661 , y: 0.073312 },
-                "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                "Shelf A": { x: 2.46 , y: -0.47 },
+                "Shelf B": { x: 0, y: 0 },
                 "Shelf C": { x: 2.51197 , y: -4.50967 },
                 "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                "Location 1": { x: 10.8946 , y: -2.29781 },
+                "Location 1": { x: 1.5 , y: 1 },
                 "Location 2": { x: 13.2928 , y: -5.59084 },
                 "Location 3": { x: 10.8946 , y: -6.70115 },
             }
-            
+
             // Pick
             Column {
                 spacing: 10
-                
+
                 Label {
                     text: "SHELVES"
                     font.pointSize: 16
@@ -1365,19 +1387,19 @@ Window {
                     font.italic: true
                     font.underline: false
                 }
-                
+
                 ComboBox {
                     id: shelfDropdown
                     width: 180
                     height: 40
                     model: ["", "Shelf A", "Shelf B", "Shelf C" , "Shelf D"]
                     currentIndex: -1
-                    
+
                     background: Rectangle {
                         color: "#DBE2E9"
                         radius: 8
                     }
-                    
+
                     contentItem: Text {
                         text: shelfDropdown.currentText || "Select a Shelf"
                         color: "black"
@@ -1385,7 +1407,7 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                     }
-                    
+
                     indicator: Rectangle {
                         width: 5
                         height: 5
@@ -1398,11 +1420,11 @@ Window {
                     }
                 }
             }
-            
+
             // Drop
             Column {
                 spacing: 10
-                
+
                 Label {
                     text: "LOCATIONS"
                     font.pointSize: 16
@@ -1411,18 +1433,18 @@ Window {
                     font.underline: false
                     font.italic: true
                 }
-                
+
                 ComboBox {
                     id: locationDropdown
                     width: 180
                     height: 40
                     model: ["", "Location 1", "Location 2", "Location 3"]
-                    
+
                     background: Rectangle {
                         color: "#DBE2E9"
                         radius: 8
                     }
-                    
+
                     contentItem: Text {
                         text: locationDropdown.currentText || "Select a Location"
                         color: "black"
@@ -1430,7 +1452,7 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                     }
-                    
+
                     indicator: Rectangle {
                         width: 5
                         height: 5
@@ -1444,7 +1466,7 @@ Window {
                 }
             }
         }
-        
+
         // Send Start Goal
         Button {
             text: "PICK"
@@ -1456,12 +1478,12 @@ Window {
             anchors.rightMargin: 80
             font.bold: true
             font.pointSize: 14
-            
+
             background: Rectangle {
                 color: "#2bd91b"
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: parent.text
                 font.pixelSize: 22
@@ -1471,27 +1493,27 @@ Window {
                 verticalAlignment: Text.AlignVCenter
                 font.family: "Tahoma"
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 property var goalCoordinates: {
-                    "Shelf A": { x: 8.47661 , y: 0.073312 },
-                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf A": { x: 2.46 , y: -0.47 },
+                    "Shelf B": { x: 0, y: 0 },
                     "Shelf C": { x: 2.51197 , y: -4.50967 },
                     "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 1": { x: 1.5 , y: 1 },
                     "Location 2": { x: 13.2928 , y: -5.59084 },
                     "Location 3": { x: 10.8946 , y: -6.70115 },
                 }
                 onClicked: {
                     console.log("Selected Shelf: " + shelfDropdown.currentText);
                     console.log("Selected Location: " + locationDropdown.currentText);
-                    
+
                     var shelf = shelfDropdown.currentText;
                     var goal = goalCoordinates[shelf];
-                    
+
                     if (goal) {
                         console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
                         rosConnector.sendGoal(goal.x, goal.y);
@@ -1509,7 +1531,7 @@ Window {
                 }
             }
         }
-        
+
         // Send End Goal
         Button {
             text: "DROP"
@@ -1521,12 +1543,12 @@ Window {
             anchors.rightMargin: 80
             font.bold: true
             font.pointSize: 14
-            
+
             background: Rectangle {
                 color: "#2bd91b"
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: parent.text
                 font.pixelSize: 22
@@ -1536,27 +1558,27 @@ Window {
                 verticalAlignment: Text.AlignVCenter
                 font.family: "Tahoma"
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 property var goalCoordinates: {
-                    "Shelf A": { x: 8.47661 , y: 0.073312 },
-                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf A": { x: 2.47 , y: -0.47},
+                    "Shelf B": { x: 0, y: 0},
                     "Shelf C": { x: 2.51197 , y: -4.50967 },
                     "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 1": { x: 1.5 , y: 1 },
                     "Location 2": { x: 13.2928 , y: -5.59084 },
                     "Location 3": { x: 10.8946 , y: -6.70115 },
                 }
                 onClicked: {
                     console.log("Selected Shelf: " + shelfDropdown.currentText);
                     console.log("Selected Location: " + locationDropdown.currentText);
-                    
+
                     var location = locationDropdown.currentText;
                     var goal = goalCoordinates[location];
-                    
+
                     if (goal) {
                         console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
                         rosConnector.sendGoal(goal.x, goal.y);
@@ -1574,30 +1596,30 @@ Window {
                 }
             }
         }
-        
+
         // QR Scan
         Item {
             id: qrScanner
             width: parent.width
             height: parent.height
             z: 100
-            
+
             property bool cameraVisible: false
             property real cameraWidth: cameraVisible ? 600 : 0
             property real cameraHeight: cameraVisible ? 500 : 0
             property var scannedCoordinates: []
-            
+
             Camera {
                 id: camera
                 active: qrScanner.cameraVisible
             }
-            
+
             CaptureSession {
                 id: captureSession
                 camera: camera
                 videoOutput: viewfinder
             }
-            
+
             VideoOutput {
                 id: viewfinder
                 anchors.centerIn: parent
@@ -1606,7 +1628,7 @@ Window {
                 visible: qrScanner.cameraVisible
                 fillMode: VideoOutput.PreserveAspectFit
             }
-            
+
             Timer {
                 interval: 1000
                 running: qrScanner.cameraVisible
@@ -1616,7 +1638,7 @@ Window {
                         qrDecoder.decodeImage(viewfinder.videoFrame);
                 }
             }
-            
+
             Button {
                 id: toggleButton
                 width: 160
@@ -1624,15 +1646,15 @@ Window {
                 x: parent.width - width - 90
                 y: 520
                 text: qrScanner.cameraVisible ? "CLOSE QR CAMERA" : "OPEN QR CAMERA"
-                
+
                 font.pointSize: 12
                 font.bold: true
-                
+
                 background: Rectangle {
                     color: qrScanner.cameraVisible ? "#ff9a00" : "#ff9a00"
                     radius: 12
                 }
-                
+
                 contentItem: Text {
                     text: toggleButton.text
                     color: "white"
@@ -1640,7 +1662,7 @@ Window {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
-                
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -1651,7 +1673,7 @@ Window {
                 }
             }
         }
-        
+
         // Emergency Button
         Button {
             text: "Emergency Stop"
@@ -1660,17 +1682,17 @@ Window {
             font.bold: true
             font.pointSize: 13
             font.family: "Tahoma"
-            
+
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.rightMargin: 90
             anchors.topMargin: 600
-            
+
             background: Rectangle {
                 color: "red";
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: "Emergency Stop"
                 font.bold: true
@@ -1680,7 +1702,7 @@ Window {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -1688,6 +1710,7 @@ Window {
                 onClicked: {console.log("Emergency Stop Triggered!");
                     rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                     rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                    rosConnector.sendMessage('{"op":"publish","topic":"/move_base/cancel","msg":{"stamp":{"secs":0,"nsecs":0},"id":""}}');
                     statusMessage.text = "ASLR Stopped!";
                     statusMessage.color = "red";
                     statusMessage.visible = true;
@@ -1695,7 +1718,7 @@ Window {
                 }
             }
         }
-        
+
         // Digital Twin
         Row {
             id: cameraMapRow
@@ -1703,60 +1726,60 @@ Window {
             property real mapScaley: 48
             property real mapWidth: digitalTwinMap.width
             property real mapHeight: digitalTwinMap.height
-            
+
             // Initial pixel anchor
             property real initialPixelX: 50
             property real initialPixelY: 90
-            
+
             // Dynamic robot pose in pixels
             property real robotX: initialPixelX
             property real robotY: initialPixelY
             property real robotRotation: 0
-            
+
             // AMCL origin to align ROS coordinates with pixel space
             property real originX: undefined
             property real originY: undefined
-            
+
             // Convert from ROS meters to pixels
             function metersToPixelsX(x) {
                 return (x - originX) * mapScalex + initialPixelX;
             }
-            
+
             function metersToPixelsY(y) {
                 return initialPixelY - (y - originY) * mapScaley;
             }
-            
+
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 230
             anchors.rightMargin: 100
             spacing: 30
-            
+
             Rectangle {
                 id: digitalTwinMap
                 width: 900
                 height: 450
                 color: "#f0f0f0"
-                
+
                 Image {
                     id: mapImage
                     anchors.fill: parent
                     source: "qrc:/Images/map_with_shelves.png"
                 }
-                
+
                 // Global path canvas
                 Canvas {
                     id: pathCanvas
                     anchors.fill: parent
                     property var globalPath: []
-                    
+
                     onPaint: {
                         var ctx = getContext("2d");
                         ctx.clearRect(0, 0, width, height);
                         ctx.lineWidth = 2;
                         ctx.strokeStyle = "blue";
-                        
+
                         if (globalPath.length > 1) {
                             ctx.beginPath();
                             ctx.moveTo(globalPath[0].x, globalPath[0].y);
@@ -1767,7 +1790,7 @@ Window {
                         }
                     }
                 }
-                
+
                 // Robot Icon
                 Image {
                     id: robotIcon
@@ -1776,12 +1799,12 @@ Window {
                     height: 40
                     x: cameraMapRow.robotX - width / 2
                     y: cameraMapRow.robotY - height / 2
-                    rotation: cameraMapRow.robotRotation
+                    //rotation: cameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
                 }
-                
+
                 // Goal marker
                 Image {
                     id: goalMarker
@@ -1794,65 +1817,65 @@ Window {
                     antialiasing: true
                 }
             }
-            
+
             NumberAnimation on robotX { duration: 5 }
             NumberAnimation on robotY { duration: 5 }
-            
+
             Connections {
                 target: rosConnector
-                
+
                 function onPoseReceived(json) {
                     var pose = JSON.parse(json);
                     var x = pose.position.x;
                     var y = pose.position.y;
                     var q = pose.orientation;
-                    
+
                     if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
                         cameraMapRow.originX = x;
                         cameraMapRow.originY = y;
                         console.log("Origin set to:", x, y);
                     }
-                    
+
                     cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
                     cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
                     cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
                 }
-                
+
                 function onGlobalPathReceived(json) {
                     var arr = JSON.parse(json);
-                    
+
                     if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined) {
                         console.log("Skipping path drawing until origin is known.");
                         return;
                     }
-                    
+
                     pathCanvas.globalPath = arr.map(p => ({
                                                               x: cameraMapRow.metersToPixelsX(p.pose.position.x),
                                                               y: cameraMapRow.metersToPixelsY(p.pose.position.y)
                                                           }));
                     pathCanvas.requestPaint();
                 }
-                
+
                 function onGoalReceived(json) {
                     var goal = JSON.parse(json);
                     var x = goal.position.x;
                     var y = goal.position.y;
-                    
+
                     if (cameraMapRow.originX === undefined || cameraMapRow.originY === undefined)
                         return;
-                    
+
                     var pixelX = cameraMapRow.metersToPixelsX(x);
                     var pixelY = cameraMapRow.metersToPixelsY(y);
-                    
+
                     goalMarker.visible = true;
                     goalMarker.x = pixelX - goalMarker.width / 2;
                     goalMarker.y = pixelY - goalMarker.height / 2;
-                    
+
                     console.log("Goal marker placed at:", pixelX, pixelY);
                 }
             }
         }
-        
+
         // Back Button
         Button {
             text: "Back"
@@ -1866,12 +1889,12 @@ Window {
             font.pointSize: 10
             font.family: "Tahoma"
             display: AbstractButton.TextOnly
-            
+
             background: Rectangle {
                 color: "#D32F2F"
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: parent.text
                 font.pixelSize: 18
@@ -1881,7 +1904,7 @@ Window {
                 color: "white"
                 anchors.centerIn: parent
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -1899,17 +1922,17 @@ Window {
         id: manualControlPage
         visible: false
         anchors.fill: parent
-        
+
         // Time & Date Display
         Item {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 20
             anchors.rightMargin: 20
-            
+
             property string currentDate: Qt.formatDate(new Date(), "dddd, MMMM dd")
             property string currentTime: Qt.formatTime(new Date(), "hh:mm:ss ap")
-            
+
             Timer {
                 interval: 1000
                 running: true
@@ -1919,25 +1942,25 @@ Window {
                     timeDateContainer.currentDate = Qt.formatDate(new Date(), "dddd, MMMM dd")
                 }
             }
-            
+
             Rectangle {
                 x: -195
                 y: 0
                 width: 250
                 height: 70
                 color: "#ffffff"
-                
+
                 Column {
                     anchors.centerIn: parent
                     spacing: 2
-                    
+
                     Text {
                         text: timeDateContainer.currentDate
                         font.pixelSize: 16
                         font.bold: true
                         color: "#333333"
                     }
-                    
+
                     Text {
                         text: timeDateContainer.currentTime
                         font.pixelSize: 20
@@ -1947,7 +1970,7 @@ Window {
                 }
             }
         }
-        
+
         // Title
         Text {
             x: 240
@@ -1992,118 +2015,109 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
-            height: 60
+            width: parent.width
+            height: 62
             opacity: 0.9
             color: "#18C519"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
+        // Robot Control
         Rectangle {
-            x: 1100
-            y: 100
+            id: robotControlBackground
             width: 266
             height: 56
             opacity: 0.7
             color: "#525ed4"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 0
+            anchors.topMargin: 100
             z: -22
         }
         Text {
-            x: 1142
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Robot Control")
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 120
-            anchors.topMargin: 108
+            color: "#f8f9fA"
+            anchors.centerIn: robotControlBackground
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
             font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
+        // Mechanism Control
         Rectangle {
-            x: 1100
-            y: 470
+            id: mechControlBackground
             width: 266
             height: 56
             opacity: 0.7
             color: "#525ed4"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 0
+            anchors.topMargin: 470
             z: -22
         }
         Text {
-            x: 1188
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Mechanism Control")
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 88
-            anchors.topMargin: 478
+            color: "#f8f9fA"
+            anchors.centerIn: mechControlBackground
             font.pixelSize: 24
+            font.styleName: "Bold"
+            font.bold: true
+            font.family: "Tahoma"
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            font.styleName: "Bold"
-            font.family: "Tahoma"
-            font.bold: true
         }
+        // Warehouse Map
         Rectangle {
-            x: 0
-            y: 160
+            id: warehouseMapBackground
             width: 266
             height: 55
             opacity: 0.7
             color: "#525ed4"
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.leftMargin: 0
+            anchors.topMargin: 160
             z: 22
         }
         Text {
-            x: 2
-            z: 23
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Warehouse Map")
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.leftMargin: 108
-            anchors.topMargin: 167
+            color: "#f8f9fA"
+            anchors.centerIn: warehouseMapBackground
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
             font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            z: 23
         }
-        
+
+
         // Status & Battery Display
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 20
             spacing: 10
-            
-            //  Status Display
+
+            // Status Display
             Row {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                
+
                 Label {
                     text: "Status:"
                     font.pointSize: 16
                     font.bold: true
                     color: "black"
                 }
-                
+
                 Label {
                     id: mstatusLabel
                     text: "Idle"
@@ -2111,112 +2125,112 @@ Window {
                     font.bold: true
                     color: "orange"
                 }
-                
+
                 Connections {
                     target: rosConnector
-                    
-                    onMessageReceived: function(message) {
+
+                    function updateStatus(isMoving) {
+                        console.log("Status update:", isMoving ? "Busy" : "Idle");
+                        mstatusLabel.text = isMoving ? "Busy" : "Idle";
+                        mstatusLabel.color = isMoving ? "red" : "orange";
+                    }
+
+                    function handleVelocity(message) {
                         try {
-                            let data = JSON.parse(message);
-                            console.log("Received message for status:", data);
-                            if (data.topic === "/hoverboard/connected") {
-                                let status = data.msg.data;
-                                updateStatus(status);
-                            }
+                            let twist = JSON.parse(message);
+                            console.log("Received twist:", twist);
+
+                            let moving = !(
+                                    twist.linear.x === 0 &&
+                                    twist.linear.y === 0 &&
+                                    twist.linear.z === 0 &&
+                                    twist.angular.x === 0 &&
+                                    twist.angular.y === 0 &&
+                                    twist.angular.z === 0
+                                    );
+                            updateStatus(moving);
                         } catch (e) {
-                            console.error("Error parsing message:", e);
+                            console.error("Error parsing twist:", e);
                         }
                     }
-                }
-                
-                function updateStatus(status) {
-                    console.log("Status update:", status);
-                    if (status === false) {
-                        mstatusLabel.text = "Idle";
-                        mstatusLabel.color = "orange";
-                    } else if (status === true) {
-                        mstatusLabel.text = "Busy";
-                        mstatusLabel.color = "green";
+
+                    onCmdVelReceived: function(message) {
+                        handleVelocity(message);
+                    }
+
+                    onHoverboardCmdVelReceived: function(message) {
+                        handleVelocity(message);
                     }
                 }
             }
-            
+
             // Battery Level Display
             Column {
                 spacing: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                
+
                 Row {
                     spacing: 5
                     anchors.horizontalCenter: parent.horizontalCenter
-                    
+
                     Label {
                         text: "Battery:"
                         font.pointSize: 14
                         font.bold: true
                         color: "black"
                     }
-                    
+
                     Label {
-                        id: mbatteryPercentage
+                        id: mbatteryPercentageLabel
                         text: " 0%"
                         font.pointSize: 14
                         font.bold: true
                     }
-                    
-                    Timer {
-                        id: mbatterySubscribeTimer
-                        interval: 1000
-                        running: true
-                        repeat: true
-                    }
+
                     Connections {
                         target: rosConnector
-                        
-                        onMessageReceived: function(message) {
+
+                        onBatteryVoltageReceived: function(voltageJson) {
                             try {
-                                let data = JSON.parse(message);
-                                console.log("Received battery message:", data);
-                                if (data.topic === "/hoverboard/battery_voltage") {
-                                    let voltage = data.msg.data
-                                    
-                                    let percentage = ((voltage - 33) / (42 - 33)) * 100
-                                    percentage = Math.min(100, Math.max(0, percentage))
-                                    
-                                    mbatteryPercentage.text = Math.round(percentage) + "%"
-                                    mbatteryBar.width = 200 * (percentage / 100)
-                                    
-                                    if (percentage > 60) {
-                                        mbatteryPercentage.color = "green"
-                                        mbatteryBar.color = "green"
-                                    } else if (percentage > 30) {
-                                        mbatteryPercentage.color = "orange"
-                                        mbatteryBar.color = "orange"
-                                    } else {
-                                        mbatteryPercentage.color = "red"
-                                        mbatteryBar.color = "red"
-                                    }
+                                let data = JSON.parse(voltageJson);
+                                let voltage = data.data;
+
+                                let percentage = ((voltage - 33) / (42 - 33)) * 100;
+                                percentage = Math.min(100, Math.max(0, percentage));
+
+                                mbatteryPercentageLabel.text = Math.round(percentage) + "%";
+                                mbatteryBar.width = 200 * (percentage / 100);
+
+                                if (percentage > 60) {
+                                    mbatteryPercentageLabel.color = "green";
+                                    mbatteryBar.color = "green";
+                                } else if (percentage > 30) {
+                                    mbatteryPercentageLabel.color = "orange";
+                                    mbatteryBar.color = "orange";
+                                } else {
+                                    mbatteryPercentageLabel.color = "red";
+                                    mbatteryBar.color = "red";
                                 }
                             } catch (e) {
-                                console.log("Battery message parse error:", e)
+                                console.log("Voltage JSON parse error:", e);
                             }
                         }
                     }
                 }
-                
+
                 Rectangle {
                     width: 200
                     height: 15
                     radius: 5
                     color: "#E0E0E0"
-                    
+
                     Rectangle {
                         id: mbatteryBar
                         height: parent.height
                         radius: 5
                     }
                 }
-                
+
                 // Charge Button
                 Button {
                     id: chargeButton
@@ -2228,12 +2242,12 @@ Window {
                     font.bold: true
                     font.pointSize: 14
                     font.family: "Tahoma"
-                    
+
                     background: Rectangle {
                         color: "orange"
                         radius: 10
                     }
-                    
+
                     contentItem: Text {
                         text: parent.text
                         font.pixelSize: 16
@@ -2242,7 +2256,7 @@ Window {
                         font.bold: true
                         color: "white"
                     }
-                    
+
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
@@ -2259,7 +2273,7 @@ Window {
                 }
             }
         }
-        
+
         // Notification
         Text {
             id: mstatusMessage
@@ -2273,7 +2287,7 @@ Window {
             visible: false
             text: " "
         }
-        
+
         Timer {
             id: mstatusTimer
             interval: 3000
@@ -2281,109 +2295,109 @@ Window {
             repeat: false
             onTriggered: mstatusMessage.visible = false
         }
-        
+
         // Robot Movement
         Item {
             id: controlPanel
             width: parent.width
             height: parent.height
-            
+
             property int buttonSize: 70
             property int stopSize: 70
             property int spacing: 15
-            
+
             FocusScope {
                 id: keyHandler
                 focus: true
-                
+
                 onVisibleChanged: {
                     if (manualControlPage.visible === true) keyHandler.forceActiveFocus();
                 }
-                
+
                 Keys.onPressed: (event) => {
                                     event.accepted = true;
-                                    
+
                                     switch (event.key) {
                                         case 16777235: // Numpad 8
                                         console.log("Move Forward");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         mstatusMessage.text = "Moving Forward...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case 16777237: // Numpad 2
                                         console.log("Move Backward");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         mstatusMessage.text = "Moving Backward...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case 16777234: // Numpad 4
                                         console.log("Move Left");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                         mstatusMessage.text = "Moving Left...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case 16777236: // Numpad 6
                                         console.log("Move Right");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                         mstatusMessage.text = "Moving Right...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
-                                        case 16777232: // Numpad 7
-                                        console.log("Move North-West");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        mstatusMessage.text = "Moving NW...";
-                                        mstatusMessage.color = "green";
-                                        mstatusMessage.visible = true;
-                                        mstatusTimer.start();
-                                        break;
-                                        
-                                        case 16777238: // Numpad 9
-                                        console.log("Move North-East");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        mstatusMessage.text = "Moving NE...";
-                                        mstatusMessage.color = "green";
-                                        mstatusMessage.visible = true;
-                                        mstatusTimer.start();
-                                        break;
-                                        
+
                                         case 16777233: // Numpad 1
                                         console.log("Move South-West");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                         mstatusMessage.text = "Moving SW...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case 16777239: // Numpad 3
                                         console.log("Move South-East");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                         mstatusMessage.text = "Moving SE...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
+                                        case 16777232: // Numpad 7
+                                        console.log("Move North-West");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        mstatusMessage.text = "Moving NW...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
+                                        break;
+
+                                        case 16777238: // Numpad 9
+                                        console.log("Move North-East");
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        mstatusMessage.text = "Moving NE...";
+                                        mstatusMessage.color = "green";
+                                        mstatusMessage.visible = true;
+                                        mstatusTimer.start();
+                                        break;
+
                                         case 16777227: // Numpad 5
                                         console.log("STOP");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
@@ -2393,25 +2407,25 @@ Window {
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case Qt.Key_A: // A key for Ascend
                                         console.log("Lift Ascend");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
                                         mstatusMessage.text = "Ascedning Mechanism...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case Qt.Key_D: // D key for Descend
                                         console.log("Lift Descend");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
                                         mstatusMessage.text = "Descending Mechanism...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
                                         mstatusTimer.start();
                                         break;
-                                        
+
                                         case Qt.Key_S: // S key for Lift Stop
                                         console.log("Lift Stop");
                                         rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"x"}}');
@@ -2425,11 +2439,11 @@ Window {
                                     }
                                 }
             }
-            
+
             Column {
                 id: movementGrid
                 spacing: controlPanel.spacing
-                
+
                 // Row 1: NW, UP, NE
                 Row {
                     spacing: controlPanel.spacing
@@ -2444,8 +2458,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move North-West") &
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                 mstatusMessage.text = "Moving NW...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2454,7 +2468,7 @@ Window {
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
-                    
+
                     Button {
                         text: "↑"
                         width: controlPanel.buttonSize
@@ -2466,8 +2480,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Forward");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                 mstatusMessage.text = "Moving Forward...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2476,7 +2490,7 @@ Window {
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
-                    
+
                     Button {
                         text: "↗"
                         width: controlPanel.buttonSize
@@ -2488,8 +2502,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move North-East");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                 mstatusMessage.text = "Moving NE...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2499,7 +2513,7 @@ Window {
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
                 }
-                
+
                 // Row 2: LEFT, STOP, RIGHT
                 Row {
                     spacing: controlPanel.spacing
@@ -2514,8 +2528,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Left");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                 mstatusMessage.text = "Moving Left...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2524,7 +2538,7 @@ Window {
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
-                    
+
                     Button {
                         text: "STOP"
                         width: controlPanel.stopSize
@@ -2548,7 +2562,7 @@ Window {
                             color: "red"
                             radius: 10
                         }
-                        
+
                         contentItem: Text {
                             text: "STOP"
                             font.pointSize: 16
@@ -2559,7 +2573,7 @@ Window {
                             anchors.fill: parent
                         }
                     }
-                    
+
                     Button {
                         text: "→"
                         width: controlPanel.buttonSize
@@ -2571,8 +2585,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Right");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                 mstatusMessage.text = "Moving Right...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2582,7 +2596,7 @@ Window {
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
                 }
-                
+
                 // Row 3: SW, DOWN, SE
                 Row {
                     spacing: controlPanel.spacing
@@ -2597,8 +2611,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move South-West");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                 mstatusMessage.text = "Moving SW...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2607,7 +2621,7 @@ Window {
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
-                    
+
                     Button {
                         text: "↓"
                         width: controlPanel.buttonSize
@@ -2619,8 +2633,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Backward");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                 mstatusMessage.text = "Moving Backward...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2629,7 +2643,7 @@ Window {
                         }
                         background: Rectangle { color: "#DBE2E9"; radius: 10 }
                     }
-                    
+
                     Button {
                         text: "↘"
                         width: controlPanel.buttonSize
@@ -2641,8 +2655,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move South-East");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                 mstatusMessage.text = "Moving SE...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2658,16 +2672,16 @@ Window {
                 anchors.topMargin: 190
             }
         }
-        
+
         // Mechanism Control
         Item {
             id: mechanismControl
             anchors.fill: parent
-            
+
             property int buttonWidth: 140
             property int buttonHeight: 50
             property int buttonRadius: 10
-            
+
             // Ascend Button
             Button {
                 id: ascend
@@ -2692,7 +2706,7 @@ Window {
                                                                     op: "publish",
                                                                     topic: "/linear_actuator_cmd",
                                                                     msg: {
-                                                                        data: "0"
+                                                                        data: "1"
                                                                     }
                                                                 }));
                         mstatusMessage.text = "Ascending Mechanism...";
@@ -2706,7 +2720,7 @@ Window {
                     radius: mechanismControl.buttonRadius
                 }
             }
-            
+
             // Descend Button
             Button {
                 id: descend
@@ -2730,7 +2744,7 @@ Window {
                                                                     op: "publish",
                                                                     topic: "/linear_actuator_cmd",
                                                                     msg: {
-                                                                        data: "1"
+                                                                        data: "0"
                                                                     }
                                                                 }));
                         mstatusMessage.text = "Descending Mechanism...";
@@ -2756,7 +2770,7 @@ Window {
                 anchors.leftMargin: -200
                 anchors.topMargin: 620
                 font.family: "Tahoma"
-                
+
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -2776,12 +2790,12 @@ Window {
                         mstatusTimer.start();
                     }
                 }
-                
+
                 background: Rectangle {
                     color: "red"
                     radius: mechanismControl.buttonRadius
                 }
-                
+
                 contentItem: Text {
                     text: parent.text
                     color: "white"
@@ -2794,7 +2808,7 @@ Window {
                 }
             }
         }
-        
+
         // Digital Twin
         Row {
             id: mcameraMapRow
@@ -2802,60 +2816,60 @@ Window {
             property real mapScaley: 48
             property real mapWidth: mdigitalTwinMap.width
             property real mapHeight: mdigitalTwinMap.height
-            
+
             // Initial pixel anchor
             property real initialPixelX: 50
             property real initialPixelY: 90
-            
+
             // Dynamic robot pose in pixels
             property real robotX: initialPixelX
             property real robotY: initialPixelY
             property real robotRotation: 0
-            
+
             // AMCL origin to align ROS coordinates with pixel space
             property real originX: undefined
             property real originY: undefined
-            
+
             // Convert from ROS meters to pixels
             function metersToPixelsX(x) {
                 return (x - originX) * mapScalex + initialPixelX;
             }
-            
+
             function metersToPixelsY(y) {
                 return initialPixelY - (y - originY) * mapScaley;
             }
-            
+
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 230
             anchors.rightMargin: 100
             spacing: 30
-            
+
             Rectangle {
                 id: mdigitalTwinMap
                 width: 900
                 height: 450
                 color: "#f0f0f0"
-                
+
                 Image {
                     id: mmapImage
                     anchors.fill: parent
                     source: "qrc:/Images/map_with_shelves.png"
                 }
-                
+
                 // Global path canvas
                 Canvas {
                     id: mpathCanvas
                     anchors.fill: parent
                     property var globalPath: []
-                    
+
                     onPaint: {
                         var ctx = getContext("2d");
                         ctx.clearRect(0, 0, width, height);
                         ctx.lineWidth = 2;
                         ctx.strokeStyle = "blue";
-                        
+
                         if (globalPath.length > 1) {
                             ctx.beginPath();
                             ctx.moveTo(globalPath[0].x, globalPath[0].y);
@@ -2866,7 +2880,7 @@ Window {
                         }
                     }
                 }
-                
+
                 // Robot Icon
                 Image {
                     id: mrobotIcon
@@ -2875,12 +2889,12 @@ Window {
                     height: 40
                     x: mcameraMapRow.robotX - width / 2
                     y: mcameraMapRow.robotY - height / 2
-                    rotation: mcameraMapRow.robotRotation
+                    //rotation: mcameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
                 }
-                
+
                 // Goal marker
                 Image {
                     id: mgoalMarker
@@ -2893,65 +2907,65 @@ Window {
                     antialiasing: true
                 }
             }
-            
+
             NumberAnimation on robotX { duration: 5 }
             NumberAnimation on robotY { duration: 5 }
-            
+
             Connections {
                 target: rosConnector
-                
+
                 function onPoseReceived(json) {
                     var pose = JSON.parse(json);
                     var x = pose.position.x;
                     var y = pose.position.y;
                     var q = pose.orientation;
-                    
+
                     if (mcameraMapRow.originX === undefined || mcameraMapRow.originY === undefined) {
                         mcameraMapRow.originX = x;
                         mcameraMapRow.originY = y;
                         console.log("Origin set to:", x, y);
                     }
-                    
+
                     mcameraMapRow.robotX = mcameraMapRow.metersToPixelsX(x);
                     mcameraMapRow.robotY = mcameraMapRow.metersToPixelsY(y);
                     mcameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
                 }
-                
+
                 function onGlobalPathReceived(json) {
                     var arr = JSON.parse(json);
-                    
+
                     if (mcameraMapRow.originX === undefined || mcameraMapRow.originY === undefined) {
                         console.log("Skipping path drawing until origin is known.");
                         return;
                     }
-                    
+
                     mpathCanvas.globalPath = arr.map(p => ({
                                                                x: mcameraMapRow.metersToPixelsX(p.pose.position.x),
                                                                y: mcameraMapRow.metersToPixelsY(p.pose.position.y)
                                                            }));
                     mpathCanvas.requestPaint();
                 }
-                
+
                 function onGoalReceived(json) {
                     var goal = JSON.parse(json);
                     var x = goal.position.x;
                     var y = goal.position.y;
-                    
+
                     if (mcameraMapRow.originX === undefined || mcameraMapRow.originY === undefined)
                         return;
-                    
+
                     var pixelX = mcameraMapRow.metersToPixelsX(x);
                     var pixelY = mcameraMapRow.metersToPixelsY(y);
-                    
+
                     mgoalMarker.visible = true;
                     mgoalMarker.x = pixelX - mgoalMarker.width / 2;
                     mgoalMarker.y = pixelY - mgoalMarker.height / 2;
-                    
+
                     console.log("Goal marker placed at:", pixelX, pixelY);
                 }
             }
         }
-        
+
         // Back Button
         Button {
             text: "Back"
@@ -2966,12 +2980,12 @@ Window {
             font.pointSize: 10
             font.family: "Tahoma"
             display: AbstractButton.TextOnly
-            
+
             background: Rectangle {
                 color: "#D32F2F"
                 radius: 10
             }
-            
+
             contentItem: Text {
                 text: parent.text
                 font.pixelSize: 18

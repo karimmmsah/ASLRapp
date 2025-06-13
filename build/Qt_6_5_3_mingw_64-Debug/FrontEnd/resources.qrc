@@ -9,5 +9,6 @@
         <file>Images/Logo.png</file>
         <file>Images/flag.png</file>
         <file>Images/map_with_shelves.png</file>
+        <file>Images/final_map.png</file>
     </qresource>
 </RCC>

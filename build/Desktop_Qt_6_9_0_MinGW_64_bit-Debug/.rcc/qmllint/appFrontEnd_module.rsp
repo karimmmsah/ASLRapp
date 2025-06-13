@@ -1,0 +1,10 @@
+-I
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug
+-I
+F:/Qt/6.9.0/mingw_64/qml
+--resource
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/.qt/rcc/qmake_FrontEnd.qrc
+--resource
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/.qt/rcc/appFrontEnd_raw_qml_0.qrc
+--module
+FrontEnd

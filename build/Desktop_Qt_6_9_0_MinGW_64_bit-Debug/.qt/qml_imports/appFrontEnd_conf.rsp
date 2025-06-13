@@ -1,0 +1,14 @@
+-rootPath
+F:/application/FrontEnd
+-cmake-output
+-output-file
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/.qt/qml_imports/appFrontEnd_conf.cmake
+-importPath
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/FrontEnd
+-importPath
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug
+-importPath
+F:/Qt/6.9.0/mingw_64/qml
+-qrcFiles
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/.qt/rcc/qmake_FrontEnd.qrc
+F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/.qt/rcc/appFrontEnd_raw_qml_0.qrc

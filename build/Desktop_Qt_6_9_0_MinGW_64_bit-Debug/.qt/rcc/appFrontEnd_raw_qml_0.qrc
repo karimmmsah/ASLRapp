@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/FrontEnd/">
+    <file alias="Main.qml">F:/application/FrontEnd/Main.qml</file>
+    <file alias="resources.qrc">F:/application/FrontEnd/resources.qrc</file>
+  </qresource>
+</RCC>
+

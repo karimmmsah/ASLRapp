@@ -1,0 +1,3 @@
+set(__QT_DEPLOY_TARGET_appFrontEnd_FILE F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/appFrontEnd.exe)
+set(__QT_DEPLOY_TARGET_appFrontEnd_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_appFrontEnd_RUNTIME_DLLS F:/Qt/6.9.0/mingw_64/bin/Qt6Quick.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6WebSockets.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6Widgets.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6QmlMeta.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6QmlWorkerScript.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6QmlModels.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6Qml.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6OpenGL.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6Network.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6Gui.dll;F:/Qt/6.9.0/mingw_64/bin/Qt6Core.dll)

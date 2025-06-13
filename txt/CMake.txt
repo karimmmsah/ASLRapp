@@ -33,10 +33,10 @@ qt_add_qml_module(appFrontEnd
     QML_FILES Main.qml
     RESOURCES resources.qrc
     SOURCES
-        AuthenticationManager.h
-        AuthenticationManager.cpp
-        RosConnector.h
-        RosConnector.cpp
+    AuthenticationManager.h
+    AuthenticationManager.cpp
+    RosConnector.h
+    RosConnector.cpp
 )
 
 target_link_libraries(appFrontEnd PRIVATE

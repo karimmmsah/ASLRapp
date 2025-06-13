@@ -38,6 +38,17 @@
                     ],
                     "name": "sendGoal",
                     "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "ip",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "setRosIp",
+                    "returnType": "void"
                 }
             ],
             "object": true,
@@ -160,6 +171,17 @@
                         }
                     ],
                     "name": "hoverboardCmdVelReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "voltageJson",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "batteryVoltageReceived",
                     "returnType": "void"
                 }
             ],

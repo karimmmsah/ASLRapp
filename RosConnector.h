@@ -20,6 +20,7 @@ public:
     Q_INVOKABLE void goToChargingStation();
     Q_INVOKABLE void sendMessage(const QString &message);
     Q_INVOKABLE void sendGoal(double x, double y);
+    Q_INVOKABLE void setRosIp(const QString &ip);
 
 signals:
     void connectedToRos();
@@ -33,6 +34,7 @@ signals:
     void costmapReceived(const QString &json);
     void cmdVelReceived(const QString &twistJson);
     void hoverboardCmdVelReceived(const QString &twistJson);
+    void batteryVoltageReceived(const QString &voltageJson);
 
 private slots:
     void onConnected();
@@ -42,6 +44,7 @@ private:
     void subscribeToTopics();
     QWebSocket webSocket;
     bool m_isConnected = false;
+    QString m_rosIp = "192.168.1.50";
 };
 
 #endif // ROSCONNECTOR_H

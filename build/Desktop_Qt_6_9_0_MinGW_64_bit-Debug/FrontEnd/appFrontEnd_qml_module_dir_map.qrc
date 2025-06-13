@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="/FrontEnd">F:/application/FrontEnd/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/FrontEnd</file>
+
+  </qresource>
+</RCC>

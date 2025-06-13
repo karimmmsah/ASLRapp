@@ -15,10 +15,12 @@ class RosConnector : public QObject {
 public:
     explicit RosConnector(QObject *parent = nullptr);
     void onMessageReceived(const QString &message);
+    bool isConnected() const { return m_isConnected; }
     Q_INVOKABLE void connectToRos();
     Q_INVOKABLE void goToChargingStation();
     Q_INVOKABLE void sendMessage(const QString &message);
-    bool isConnected() const { return m_isConnected; } 
+    Q_INVOKABLE void sendGoal(double x, double y);
+    Q_INVOKABLE void setRosIp(const QString &ip);
 
 signals:
     void connectedToRos();
@@ -28,6 +30,11 @@ signals:
     void mapReceived(const QString &json);
     void globalPathReceived(const QString &json);
     void localPathReceived(const QString &json);
+    void goalReceived(const QString &json);
+    void costmapReceived(const QString &json);
+    void cmdVelReceived(const QString &twistJson);
+    void hoverboardCmdVelReceived(const QString &twistJson);
+    void batteryVoltageReceived(const QString &voltageJson);
 
 private slots:
     void onConnected();
@@ -37,6 +44,7 @@ private:
     void subscribeToTopics();
     QWebSocket webSocket;
     bool m_isConnected = false;
+    QString m_rosIp = "192.168.1.50";
 };
 
 #endif // ROSCONNECTOR_H

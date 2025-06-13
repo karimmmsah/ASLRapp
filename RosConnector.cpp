@@ -7,8 +7,13 @@ RosConnector::RosConnector(QObject *parent) : QObject(parent) {
 }
 
 void RosConnector::connectToRos() {
-    qDebug() << "Attempting to connect to ASLR...";
-    webSocket.open(QUrl("ws://192.168.1.50:9090")); // IP Address
+    qDebug() << "Attempting to connect to ASLR at" << m_rosIp;
+    webSocket.open(QUrl("ws://" + m_rosIp + ":9090"));
+}
+
+void RosConnector::setRosIp(const QString &ip) {
+    m_rosIp = ip;
+    qDebug() << "Updated ROS IP to:" << m_rosIp;
 }
 
 void RosConnector::onConnected() {
@@ -36,6 +41,11 @@ void RosConnector::sendMessage(const QString &message) {
 }
 
 void RosConnector::subscribeToTopics() {
+    if (!m_isConnected || !webSocket.isValid()) {
+        qDebug() << "WebSocket is not valid or not connected.";
+        return;
+    }
+
     auto subscribe = [this](const QString &topic, const QString &type) {
         QJsonObject obj;
         obj["op"] = "subscribe";
@@ -48,17 +58,16 @@ void RosConnector::subscribeToTopics() {
     subscribe("/cmd_vel", "geometry_msgs/Twist");
     subscribe("/hoverboard_velocity_controller/cmd_vel", "geometry_msgs/Twist");
 
-    // Battery & Status
-    subscribe("/hoverboard/connected", "std_msgs/Bool");
+    // Battery
     subscribe("/hoverboard/battery_voltage", "std_msgs/Float64");
 
     // Navigation & Map
     subscribe("/amcl_pose", "geometry_msgs/PoseWithCovarianceStamped");
     subscribe("/map", "nav_msgs/OccupancyGrid");
-    subscribe("/move_base/GlobalPlanner/plan", "nav_msgs/Path");
-    subscribe("/move_base/NavfnROS/plan", "nav_msgs/Path");
     subscribe("/move_base/DWAPlannerROS/local_plan", "nav_msgs/Path");
+    subscribe("/move_base/NavfnROS/plan", "nav_msgs/Path");
     subscribe("/move_base_simple/goal", "geometry_msgs/PoseStamped");
+    //subscribe("/move_base/GlobalPlanner/plan", "nav_msgs/Path");
 }
 
 void RosConnector::onMessageReceived(const QString &message) {
@@ -72,24 +81,13 @@ void RosConnector::onMessageReceived(const QString &message) {
     QJsonObject obj = doc.object();
     QString topic = obj["topic"].toString();
 
-    if (topic == "/hoverboard/connected" || topic == "/hoverboard/battery_voltage") {
-        onMessageReceived(message);
-        return;
-    }
-
     if (topic == "/amcl_pose") {
         QJsonObject pose = obj["msg"].toObject()["pose"].toObject()["pose"].toObject();
         emit poseReceived(QJsonDocument(pose).toJson(QJsonDocument::Compact));
     } else if (topic == "/map") {
         QJsonObject msg = obj["msg"].toObject();
         emit mapReceived(QJsonDocument(msg).toJson(QJsonDocument::Compact));
-    } else if (topic == "/move_base/GlobalPlanner/plan") {
-        QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
-        emit globalPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
-    } else if (topic == "/move_base/DWAPlannerROS/local_plan") {
-        QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
-        emit localPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
-    } else if (topic == "/move_base/DWAPlannerROS/global_plan") {
+    } else if (topic == "/move_base/NavfnROS/plan") {
         QJsonArray poses = obj["msg"].toObject()["poses"].toArray();
         emit globalPathReceived(QJsonDocument(poses).toJson(QJsonDocument::Compact));
     } else if (topic == "/move_base_simple/goal") {
@@ -101,6 +99,12 @@ void RosConnector::onMessageReceived(const QString &message) {
     } else if (topic == "/hoverboard_velocity_controller/cmd_vel") {
         QJsonObject msg = obj["msg"].toObject();
         emit hoverboardCmdVelReceived(QJsonDocument(msg).toJson(QJsonDocument::Compact));
+    } else if (topic == "/hoverboard/battery_voltage") {
+        QJsonObject msg = obj["msg"].toObject();
+        emit batteryVoltageReceived(QJsonDocument(msg).toJson(QJsonDocument::Compact));
+    }
+    else {
+        qDebug() << "Unhandled topic:" << topic;
     }
 }
 
@@ -143,8 +147,8 @@ void RosConnector::goToChargingStation() {
         return;
     }
 
-    double x = 1;
-    double y = 1;
+    double x = 0;
+    double y = 0;
 
     QJsonObject message;
     message["op"] = "publish";

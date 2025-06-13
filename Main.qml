@@ -179,16 +179,47 @@ Window {
             }
             // Decorations
             Rectangle {
-                x: 856
-                width: 2000
+                width: parent.width
                 height: 62
                 opacity: 0.9
                 color: "#ff9a00"
-                anchors.right: parent.right
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                anchors.rightMargin: -2
-                anchors.topMargin: 760
+                anchors.topMargin: 855
                 z: -22
+            }
+
+            // IP Address Assign
+            Column {
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
+                anchors.margins: 16
+                spacing: 4
+
+                Label {
+                    text: "IP Address"
+                    color: "black"
+                    font.bold: true
+                    font.pointSize: 12
+                }
+
+                TextField {
+                    id: ipInput
+                    placeholderText: "Enter ROS IP"
+                    text: "192.168.1.X"
+                    width: 180
+                    height: 35
+                    font.pointSize: 14
+                    padding: 10
+                    color: "black"
+
+                    background: Rectangle {
+                        color: "#F0F0F0"
+                        radius: 8
+                        border.color: "#A0A0A0"
+                        border.width: 1
+                    }
+                }
             }
 
             // Connect Button
@@ -221,6 +252,7 @@ Window {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        rosConnector.setRosIp(ipInput.text)
                         rosConnector.connectToRos();
                     }
                 }
@@ -523,15 +555,13 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
+            width: parent.width
             height: 62
             opacity: 0.9
             color: "#3E424B"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
 
@@ -875,15 +905,13 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
+            width: parent.width
             height: 62
             opacity: 0.9
             color: "#2196F3"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
 
@@ -912,9 +940,7 @@ Window {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: controlToggle.radius
-                            color: autonomousMouseArea.containsMouse ? "#2196F3"
-                                                                     : "#DBE2E9"
-
+                            color: autonomousMouseArea.containsMouse ? "#2196F3" : "#DBE2E9"
 
                             Text {
                                 text: "AUTONOMOUS"
@@ -941,8 +967,7 @@ Window {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: controlToggle.radius
-                            color: manualMouseArea.containsMouse ? "#2196F3"
-                                                                 : "#DBE2E9"
+                            color: manualMouseArea.containsMouse ? "#2196F3" : "#DBE2E9"
 
                             Text {
                                 text: "MANUAL"
@@ -1111,72 +1136,70 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
-            height: 60
+            width: parent.width
+            height: 62
             opacity: 0.9
             color: "#18C519"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
+        // Top-right Rectangle and Text: "Pick & Drop"
         Rectangle {
-            x: 1100
-            y: 100
             width: 266
             height: 55
             opacity: 0.7
             color: "#525ed4"
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 100
+            anchors.rightMargin: 0
             z: -22
         }
+
         Text {
-            x: 1142
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Pick & Drop")
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 120
-            anchors.topMargin: 108
+            color: "#f8f9fA"
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
-            font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 112
+            anchors.rightMargin: 100
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
+
+        // Left-side Rectangle and Text: "Warehouse Map"
         Rectangle {
-            x: 0
-            y: 160
             width: 266
             height: 55
             opacity: 0.7
             color: "#525ed4"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 160
+            anchors.leftMargin: 0
             z: 22
         }
+
         Text {
-            x: 2
-            z: 23
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Warehouse Map")
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.leftMargin: 108
-            anchors.topMargin: 167
+            color: "#f8f9fA"
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
-            font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 172
+            anchors.leftMargin: 50
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            z: 23
         }
+
 
         // Status & Battery Display
         Column {
@@ -1220,13 +1243,13 @@ Window {
                             console.log("Received twist:", twist);
 
                             let moving = !(
-                                twist.linear.x === 0 &&
-                                twist.linear.y === 0 &&
-                                twist.linear.z === 0 &&
-                                twist.angular.x === 0 &&
-                                twist.angular.y === 0 &&
-                                twist.angular.z === 0
-                            );
+                                    twist.linear.x === 0 &&
+                                    twist.linear.y === 0 &&
+                                    twist.linear.z === 0 &&
+                                    twist.angular.x === 0 &&
+                                    twist.angular.y === 0 &&
+                                    twist.angular.z === 0
+                                    );
                             updateStatus(moving);
                         } catch (e) {
                             console.error("Error parsing twist:", e);
@@ -1266,42 +1289,32 @@ Window {
                         font.bold: true
                     }
 
-                    Timer {
-                        id: batterySubscribeTimer
-                        interval: 1000
-                        running: true
-                        repeat: true
-                    }
-
                     Connections {
                         target: rosConnector
 
-                        onMessageReceived: function(message) {
+                        onBatteryVoltageReceived: function(voltageJson) {
                             try {
-                                let data = JSON.parse(message);
-                                console.log("Received battery message:", data);
-                                if (data.topic === "/hoverboard/battery_voltage") {
-                                    let voltage = data.msg.data;
+                                let data = JSON.parse(voltageJson);
+                                let voltage = data.data;
 
-                                    let percentage = ((voltage - 33) / (42 - 33)) * 100;
-                                    percentage = Math.min(100, Math.max(0, percentage));
+                                let percentage = ((voltage - 33) / (42 - 33)) * 100;
+                                percentage = Math.min(100, Math.max(0, percentage));
 
-                                    batteryPercentageLabel.text = Math.round(percentage) + "%";
-                                    batteryBar.width = 200 * (percentage / 100);
+                                batteryPercentageLabel.text = Math.round(percentage) + "%";
+                                batteryBar.width = 200 * (percentage / 100);
 
-                                    if (percentage > 60) {
-                                        batteryPercentageLabel.color = "green";
-                                        batteryBar.color = "green";
-                                    } else if (percentage > 30) {
-                                        batteryPercentageLabel.color = "orange";
-                                        batteryBar.color = "orange";
-                                    } else {
-                                        batteryPercentageLabel.color = "red";
-                                        batteryBar.color = "red";
-                                    }
+                                if (percentage > 60) {
+                                    batteryPercentageLabel.color = "green";
+                                    batteryBar.color = "green";
+                                } else if (percentage > 30) {
+                                    batteryPercentageLabel.color = "orange";
+                                    batteryBar.color = "orange";
+                                } else {
+                                    batteryPercentageLabel.color = "red";
+                                    batteryBar.color = "red";
                                 }
                             } catch (e) {
-                                console.log("Battery message parse error:", e);
+                                console.log("Voltage JSON parse error:", e);
                             }
                         }
                     }
@@ -1353,11 +1366,11 @@ Window {
             spacing: 80
 
             property var goalCoordinates: {
-                "Shelf A": { x: 8.47661 , y: 0.073312 },
-                "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                "Shelf A": { x: 2.46 , y: -0.47 },
+                "Shelf B": { x: 0, y: 0 },
                 "Shelf C": { x: 2.51197 , y: -4.50967 },
                 "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                "Location 1": { x: 10.8946 , y: -2.29781 },
+                "Location 1": { x: 1.5 , y: 1 },
                 "Location 2": { x: 13.2928 , y: -5.59084 },
                 "Location 3": { x: 10.8946 , y: -6.70115 },
             }
@@ -1486,11 +1499,11 @@ Window {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 property var goalCoordinates: {
-                    "Shelf A": { x: 8.47661 , y: 0.073312 },
-                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf A": { x: 2.46 , y: -0.47 },
+                    "Shelf B": { x: 0, y: 0 },
                     "Shelf C": { x: 2.51197 , y: -4.50967 },
                     "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 1": { x: 1.5 , y: 1 },
                     "Location 2": { x: 13.2928 , y: -5.59084 },
                     "Location 3": { x: 10.8946 , y: -6.70115 },
                 }
@@ -1551,11 +1564,11 @@ Window {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 property var goalCoordinates: {
-                    "Shelf A": { x: 8.47661 , y: 0.073312 },
-                    "Shelf B": { x: 8.553205421856358, y: 0.073312 -4.552061918829988 },
+                    "Shelf A": { x: 2.47 , y: -0.47},
+                    "Shelf B": { x: 0, y: 0},
                     "Shelf C": { x: 2.51197 , y: -4.50967 },
                     "Shelf D": { x: 2.51197 , y:  -1.16554 },
-                    "Location 1": { x: 10.8946 , y: -2.29781 },
+                    "Location 1": { x: 1.5 , y: 1 },
                     "Location 2": { x: 13.2928 , y: -5.59084 },
                     "Location 3": { x: 10.8946 , y: -6.70115 },
                 }
@@ -1697,6 +1710,7 @@ Window {
                 onClicked: {console.log("Emergency Stop Triggered!");
                     rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                     rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                    rosConnector.sendMessage('{"op":"publish","topic":"/move_base/cancel","msg":{"stamp":{"secs":0,"nsecs":0},"id":""}}');
                     statusMessage.text = "ASLR Stopped!";
                     statusMessage.color = "red";
                     statusMessage.visible = true;
@@ -1785,7 +1799,7 @@ Window {
                     height: 40
                     x: cameraMapRow.robotX - width / 2
                     y: cameraMapRow.robotY - height / 2
-                    rotation: cameraMapRow.robotRotation
+                    //rotation: cameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
@@ -2001,98 +2015,89 @@ Window {
         }
         // Decorations
         Rectangle {
-            x: 856
-            width: 2000
-            height: 60
+            width: parent.width
+            height: 62
             opacity: 0.9
             color: "#18C519"
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
-            anchors.rightMargin: -2
-            anchors.topMargin: 760
+            anchors.topMargin: 855
             z: -22
         }
+        // Robot Control
         Rectangle {
-            x: 1100
-            y: 100
+            id: robotControlBackground
             width: 266
             height: 56
             opacity: 0.7
             color: "#525ed4"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 0
+            anchors.topMargin: 100
             z: -22
         }
         Text {
-            x: 1142
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Robot Control")
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 120
-            anchors.topMargin: 108
+            color: "#f8f9fA"
+            anchors.centerIn: robotControlBackground
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
             font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
+        // Mechanism Control
         Rectangle {
-            x: 1100
-            y: 470
+            id: mechControlBackground
             width: 266
             height: 56
             opacity: 0.7
             color: "#525ed4"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 0
+            anchors.topMargin: 470
             z: -22
         }
         Text {
-            x: 1188
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Mechanism Control")
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 88
-            anchors.topMargin: 478
+            color: "#f8f9fA"
+            anchors.centerIn: mechControlBackground
             font.pixelSize: 24
+            font.styleName: "Bold"
+            font.bold: true
+            font.family: "Tahoma"
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            font.styleName: "Bold"
-            font.family: "Tahoma"
-            font.bold: true
         }
+        // Warehouse Map
         Rectangle {
-            x: 0
-            y: 160
+            id: warehouseMapBackground
             width: 266
             height: 55
             opacity: 0.7
             color: "#525ed4"
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.leftMargin: 0
+            anchors.topMargin: 160
             z: 22
         }
         Text {
-            x: 2
-            z: 23
-            width: 90
-            height: 40
-            color: "#f8f9fA"
             text: qsTr("Warehouse Map")
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.leftMargin: 108
-            anchors.topMargin: 167
+            color: "#f8f9fA"
+            anchors.centerIn: warehouseMapBackground
             font.pixelSize: 24
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            layer.enabled: false
             font.styleName: "Bold"
             font.bold: true
             font.family: "Tahoma"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            z: 23
         }
+
 
         // Status & Battery Display
         Column {
@@ -2136,13 +2141,13 @@ Window {
                             console.log("Received twist:", twist);
 
                             let moving = !(
-                                twist.linear.x === 0 &&
-                                twist.linear.y === 0 &&
-                                twist.linear.z === 0 &&
-                                twist.angular.x === 0 &&
-                                twist.angular.y === 0 &&
-                                twist.angular.z === 0
-                            );
+                                    twist.linear.x === 0 &&
+                                    twist.linear.y === 0 &&
+                                    twist.linear.z === 0 &&
+                                    twist.angular.x === 0 &&
+                                    twist.angular.y === 0 &&
+                                    twist.angular.z === 0
+                                    );
                             updateStatus(moving);
                         } catch (e) {
                             console.error("Error parsing twist:", e);
@@ -2176,47 +2181,38 @@ Window {
                     }
 
                     Label {
-                        id: mbatteryPercentage
+                        id: mbatteryPercentageLabel
                         text: " 0%"
                         font.pointSize: 14
                         font.bold: true
                     }
 
-                    Timer {
-                        id: mbatterySubscribeTimer
-                        interval: 1000
-                        running: true
-                        repeat: true
-                    }
                     Connections {
                         target: rosConnector
 
-                        onMessageReceived: function(message) {
+                        onBatteryVoltageReceived: function(voltageJson) {
                             try {
-                                let data = JSON.parse(message);
-                                console.log("Received battery message:", data);
-                                if (data.topic === "/hoverboard/battery_voltage") {
-                                    let voltage = data.msg.data
+                                let data = JSON.parse(voltageJson);
+                                let voltage = data.data;
 
-                                    let percentage = ((voltage - 33) / (42 - 33)) * 100
-                                    percentage = Math.min(100, Math.max(0, percentage))
+                                let percentage = ((voltage - 33) / (42 - 33)) * 100;
+                                percentage = Math.min(100, Math.max(0, percentage));
 
-                                    mbatteryPercentage.text = Math.round(percentage) + "%"
-                                    mbatteryBar.width = 200 * (percentage / 100)
+                                mbatteryPercentageLabel.text = Math.round(percentage) + "%";
+                                mbatteryBar.width = 200 * (percentage / 100);
 
-                                    if (percentage > 60) {
-                                        mbatteryPercentage.color = "green"
-                                        mbatteryBar.color = "green"
-                                    } else if (percentage > 30) {
-                                        mbatteryPercentage.color = "orange"
-                                        mbatteryBar.color = "orange"
-                                    } else {
-                                        mbatteryPercentage.color = "red"
-                                        mbatteryBar.color = "red"
-                                    }
+                                if (percentage > 60) {
+                                    mbatteryPercentageLabel.color = "green";
+                                    mbatteryBar.color = "green";
+                                } else if (percentage > 30) {
+                                    mbatteryPercentageLabel.color = "orange";
+                                    mbatteryBar.color = "orange";
+                                } else {
+                                    mbatteryPercentageLabel.color = "red";
+                                    mbatteryBar.color = "red";
                                 }
                             } catch (e) {
-                                console.log("Battery message parse error:", e)
+                                console.log("Voltage JSON parse error:", e);
                             }
                         }
                     }
@@ -2324,8 +2320,8 @@ Window {
                                     switch (event.key) {
                                         case 16777235: // Numpad 8
                                         console.log("Move Forward");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         mstatusMessage.text = "Moving Forward...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2334,8 +2330,8 @@ Window {
 
                                         case 16777237: // Numpad 2
                                         console.log("Move Backward");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                         mstatusMessage.text = "Moving Backward...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2344,8 +2340,8 @@ Window {
 
                                         case 16777234: // Numpad 4
                                         console.log("Move Left");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                         mstatusMessage.text = "Moving Left...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2354,8 +2350,8 @@ Window {
 
                                         case 16777236: // Numpad 6
                                         console.log("Move Right");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                         mstatusMessage.text = "Moving Right...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2364,8 +2360,8 @@ Window {
 
                                         case 16777233: // Numpad 1
                                         console.log("Move South-West");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                         mstatusMessage.text = "Moving SW...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2374,8 +2370,8 @@ Window {
 
                                         case 16777239: // Numpad 3
                                         console.log("Move South-East");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                         mstatusMessage.text = "Moving SE...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2384,8 +2380,8 @@ Window {
 
                                         case 16777232: // Numpad 7
                                         console.log("Move North-West");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                         mstatusMessage.text = "Moving NW...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2394,8 +2390,8 @@ Window {
 
                                         case 16777238: // Numpad 9
                                         console.log("Move North-East");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                         mstatusMessage.text = "Moving NE...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2414,7 +2410,7 @@ Window {
 
                                         case Qt.Key_A: // A key for Ascend
                                         console.log("Lift Ascend");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
                                         mstatusMessage.text = "Ascedning Mechanism...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2423,7 +2419,7 @@ Window {
 
                                         case Qt.Key_D: // D key for Descend
                                         console.log("Lift Descend");
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"1"}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/linear_actuator_cmd","msg":{"data":"0"}}');
                                         mstatusMessage.text = "Descending Mechanism...";
                                         mstatusMessage.color = "green";
                                         mstatusMessage.visible = true;
@@ -2462,8 +2458,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move North-West") &
-                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                        rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                 mstatusMessage.text = "Moving NW...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2484,8 +2480,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Forward");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                 mstatusMessage.text = "Moving Forward...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2506,8 +2502,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move North-East");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                 mstatusMessage.text = "Moving NE...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2532,8 +2528,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Left");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                 mstatusMessage.text = "Moving Left...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2589,8 +2585,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Right");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":0.0,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                 mstatusMessage.text = "Moving Right...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2615,8 +2611,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move South-West");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":-0.1}}}');
                                 mstatusMessage.text = "Moving SW...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2637,8 +2633,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move Backward");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.0}}}');
                                 mstatusMessage.text = "Moving Backward...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2659,8 +2655,8 @@ Window {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 console.log("Move South-East");
-                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
-                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.5,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.5}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
+                                rosConnector.sendMessage('{"op":"publish","topic":"/hoverboard_velocity_controller/cmd_vel","msg":{"linear":{"x":-0.1,"y":0.0,"z":0.0},"angular":{"x":0.0,"y":0.0,"z":0.1}}}');
                                 mstatusMessage.text = "Moving SE...";
                                 mstatusMessage.color = "green";
                                 mstatusMessage.visible = true;
@@ -2710,7 +2706,7 @@ Window {
                                                                     op: "publish",
                                                                     topic: "/linear_actuator_cmd",
                                                                     msg: {
-                                                                        data: "0"
+                                                                        data: "1"
                                                                     }
                                                                 }));
                         mstatusMessage.text = "Ascending Mechanism...";
@@ -2748,7 +2744,7 @@ Window {
                                                                     op: "publish",
                                                                     topic: "/linear_actuator_cmd",
                                                                     msg: {
-                                                                        data: "1"
+                                                                        data: "0"
                                                                     }
                                                                 }));
                         mstatusMessage.text = "Descending Mechanism...";
@@ -2893,7 +2889,7 @@ Window {
                     height: 40
                     x: mcameraMapRow.robotX - width / 2
                     y: mcameraMapRow.robotY - height / 2
-                    rotation: mcameraMapRow.robotRotation
+                    //rotation: mcameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
