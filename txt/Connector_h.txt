@@ -19,7 +19,7 @@ public:
     Q_INVOKABLE void connectToRos();
     Q_INVOKABLE void goToChargingStation();
     Q_INVOKABLE void sendMessage(const QString &message);
-    Q_INVOKABLE void sendGoal(double x, double y);
+    Q_INVOKABLE void sendGoal(double x, double y, double yaw);
     Q_INVOKABLE void setRosIp(const QString &ip);
 
 signals:

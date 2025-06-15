@@ -87,6 +87,10 @@
                             {
                                 "name": "y",
                                 "type": "double"
+                            },
+                            {
+                                "name": "yaw",
+                                "type": "double"
                             }
                         ],
                         "name": "sendGoal",

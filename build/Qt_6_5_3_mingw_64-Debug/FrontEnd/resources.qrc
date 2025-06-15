@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>Images/ASU.png</file>
         <file>Images/Icon.png</file>
-        <file>Images/robot_icon.png</file>
         <file>Main.qml</file>
         <file>Images/1.png</file>
         <file>Images/LiftRobot.png</file>

@@ -1001,15 +1001,15 @@
 	"dependencies" : 
 	[
 		{
-			"id" : "appFrontEnd_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
-		},
-		{
 			"backtrace" : 69,
 			"id" : "appFrontEnd_qmlimportscan::@6890427a1f51a3e7e1df"
 		},
 		{
 			"backtrace" : 71,
 			"id" : "appFrontEnd_tooling::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "appFrontEnd_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		},
 		{
 			"backtrace" : 0,

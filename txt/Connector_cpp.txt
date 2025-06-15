@@ -1,4 +1,5 @@
 #include "RosConnector.h"
+#include <QtMath>
 
 RosConnector::RosConnector(QObject *parent) : QObject(parent) {
     connect(&webSocket, &QWebSocket::connected, this, &RosConnector::onConnected);
@@ -108,7 +109,7 @@ void RosConnector::onMessageReceived(const QString &message) {
     }
 }
 
-void RosConnector::sendGoal(double x, double y) {
+void RosConnector::sendGoal(double x, double y, double yaw) {
     QJsonObject message;
     message["op"] = "publish";
     message["topic"] = "/move_base_simple/goal";
@@ -124,11 +125,15 @@ void RosConnector::sendGoal(double x, double y) {
     position["y"] = y;
     position["z"] = 0.0;
 
+    double halfYaw = yaw / 2.0;
+    double sinHalfYaw = qSin(halfYaw);
+    double cosHalfYaw = qCos(halfYaw);
+
     QJsonObject orientation;
     orientation["x"] = 0.0;
     orientation["y"] = 0.0;
-    orientation["z"] = 0.0;
-    orientation["w"] = 1.0;
+    orientation["z"] = sinHalfYaw;
+    orientation["w"] = cosHalfYaw;
 
     QJsonObject pose;
     pose["position"] = position;

@@ -64,13 +64,14 @@ static constexpr auto qt_meta_stringdata_CLASSRosConnectorENDCLASS = QtMocHelper
     "sendGoal",
     "x",
     "y",
+    "yaw",
     "setRosIp",
     "ip",
     "isConnected"
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSRosConnectorENDCLASS_t {
-    uint offsetsAndSizes[58];
+    uint offsetsAndSizes[60];
     char stringdata0[13];
     char stringdata1[15];
     char stringdata2[1];
@@ -97,9 +98,10 @@ struct qt_meta_stringdata_CLASSRosConnectorENDCLASS_t {
     char stringdata23[9];
     char stringdata24[2];
     char stringdata25[2];
-    char stringdata26[9];
-    char stringdata27[3];
-    char stringdata28[12];
+    char stringdata26[4];
+    char stringdata27[9];
+    char stringdata28[3];
+    char stringdata29[12];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSRosConnectorENDCLASS_t::offsetsAndSizes) + ofs), len 
@@ -131,9 +133,10 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSRosConnectorENDCLASS_t qt_meta_
         QT_MOC_LITERAL(331, 8),  // "sendGoal"
         QT_MOC_LITERAL(340, 1),  // "x"
         QT_MOC_LITERAL(342, 1),  // "y"
-        QT_MOC_LITERAL(344, 8),  // "setRosIp"
-        QT_MOC_LITERAL(353, 2),  // "ip"
-        QT_MOC_LITERAL(356, 11)   // "isConnected"
+        QT_MOC_LITERAL(344, 3),  // "yaw"
+        QT_MOC_LITERAL(348, 8),  // "setRosIp"
+        QT_MOC_LITERAL(357, 2),  // "ip"
+        QT_MOC_LITERAL(360, 11)   // "isConnected"
     },
     "RosConnector",
     "connectedToRos",
@@ -161,6 +164,7 @@ Q_CONSTINIT static const qt_meta_stringdata_CLASSRosConnectorENDCLASS_t qt_meta_
     "sendGoal",
     "x",
     "y",
+    "yaw",
     "setRosIp",
     "ip",
     "isConnected"
@@ -176,7 +180,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
        0,       // classname
        0,    0, // classinfo
       19,   14, // methods
-       1,  173, // properties
+       1,  175, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
@@ -204,8 +208,8 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
       19,    0,  160,    2, 0x02,   25 /* Public */,
       20,    0,  161,    2, 0x02,   26 /* Public */,
       21,    1,  162,    2, 0x02,   27 /* Public */,
-      23,    2,  165,    2, 0x02,   29 /* Public */,
-      26,    1,  170,    2, 0x02,   32 /* Public */,
+      23,    3,  165,    2, 0x02,   29 /* Public */,
+      27,    1,  172,    2, 0x02,   33 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -229,11 +233,11 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSRosConnectorENDCLASS[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,   22,
-    QMetaType::Void, QMetaType::Double, QMetaType::Double,   24,   25,
-    QMetaType::Void, QMetaType::QString,   27,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double,   24,   25,   26,
+    QMetaType::Void, QMetaType::QString,   28,
 
  // properties: name, type, flags
-      28, QMetaType::Bool, 0x00015001, uint(2), 0,
+      29, QMetaType::Bool, 0x00015001, uint(2), 0,
 
        0        // eod
 };
@@ -297,6 +301,7 @@ Q_CONSTINIT const QMetaObject RosConnector::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
+        QtPrivate::TypeAndForceComplete<double, std::false_type>,
         // method 'setRosIp'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>
@@ -327,7 +332,7 @@ void RosConnector::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 14: _t->connectToRos(); break;
         case 15: _t->goToChargingStation(); break;
         case 16: _t->sendMessage((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 17: _t->sendGoal((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2]))); break;
+        case 17: _t->sendGoal((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3]))); break;
         case 18: _t->setRosIp((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }

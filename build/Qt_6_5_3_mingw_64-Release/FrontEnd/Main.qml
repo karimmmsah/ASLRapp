@@ -1029,6 +1029,28 @@ Window {
             }
         }
 
+        // Notification
+        Text {
+            id: sstatusMessage
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 270
+            font.pointSize: 14
+            font.bold: true
+            font.family: "Tahoma"
+            color: "black"
+            visible: false
+            text: " "
+        }
+
+        Timer {
+            id: sstatusTimer
+            interval: 5000
+            running: false
+            repeat: false
+            onTriggered: sstatusMessage.visible = false
+        }
+
         // Upload Map
         Button {
             text: "Map"
@@ -1058,7 +1080,6 @@ Window {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: mapDialog.open()
-            }
         }
 
         FileDialog {
@@ -1072,6 +1093,11 @@ Window {
 
                 settings.setValue("LastMap", selected)
                 console.log("Saved map path:", selected)
+                sstatusMessage.text = "Map Uploaded.";
+                sstatusMessage.color = "#2196F3";
+                sstatusMessage.visible = true;
+                sstatusTimer.start();
+            }
             }
         }
 
@@ -1113,6 +1139,10 @@ Window {
             onAccepted: {
                 console.log("CSV selected:", csvDialog.selectedFile)
                 coordinateLoader.loadFromCsv(csvDialog.selectedFile)
+                sstatusMessage.text = "Coordinates Uploaded.";
+                sstatusMessage.color = "#4CAF50";
+                sstatusMessage.visible = true;
+                sstatusTimer.start();
             }
         }
         QtObject {
@@ -1134,19 +1164,25 @@ Window {
                 var newGoals = {};
                 var coordKeys = [];
 
-                for (var i = 1; i < lines.length; i++) {
-                    var parts = lines[i].split(",");
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (line === "" || line.toLowerCase().startsWith("name")) continue;
+
+                    var parts = line.split(",");
                     if (parts.length < 3) continue;
 
                     var name = parts[0].trim();
                     var x = parseFloat(parts[1]);
                     var y = parseFloat(parts[2]);
+                    var yaw = parts.length >= 4 ? parseFloat(parts[3]) : 0;
 
                     if (!isNaN(x) && !isNaN(y)) {
-                        newGoals[name] = { x: x, y: y };
-                        coordSettings.setValue("Coord_" + name, JSON.stringify({ x: x, y: y }));
+                        newGoals[name] = { x: x, y: y, yaw: yaw };
+                        coordSettings.setValue("Coord_" + name, JSON.stringify({ x: x, y: y, yaw: yaw }));
                         coordKeys.push(name);
-                        console.log("Loaded coordinate for", name, "→", x, y);
+                        console.log("Loaded coordinate for", name, "→", x, y, "yaw:", yaw);
+                    } else {
+                        console.warn("Invalid coordinate for", name, "in line:", line);
                     }
                 }
 
@@ -1157,6 +1193,76 @@ Window {
                 cameraMapRow.locationKeys = Object.keys(newGoals).filter(n => n.startsWith("Location"));
                 shelfDropdown.model = cameraMapRow.shelfKeys;
                 locationDropdown.model = cameraMapRow.locationKeys;
+            }
+        }
+
+        // Clear
+        Button {
+            text: "Clear"
+            width: 140
+            height: 35
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 200
+
+            background: Rectangle {
+                color: "#F44336"
+                radius: 10
+            }
+
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 18
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Tahoma"
+                font.bold: true
+                color: "white"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    // Clear map image
+                    mapImage.source = "";
+                    mmapImage.source = "";
+                    settings.setValue("LastMap", "");
+
+                    // Clear coordinates and dropdowns
+                    cameraMapRow.goalCoordinates = {};
+                    cameraMapRow.shelfKeys = [];
+                    cameraMapRow.locationKeys = [];
+                    shelfDropdown.model = [];
+                    locationDropdown.model = [];
+
+                    // Remove coordinate settings
+                    var keys = coordSettings.value("Coord_Keys", "");
+                    if (keys !== "") {
+                        var keyList = keys.split(";");
+                        for (var i = 0; i < keyList.length; i++) {
+                            coordSettings.setValue("Coord_" + keyList[i], "");
+                        }
+                        coordSettings.setValue("Coord_Keys", "");
+                    }
+
+                    // Hide goal marker
+                    goalMarker.visible = false;
+
+                    // Clear path
+                    pathCanvas.globalPath = [];
+                    pathCanvas.requestPaint();
+
+                    // Show status message
+                    sstatusMessage.text = "Map and coordinates cleared.";
+                    sstatusMessage.color = "#F44336";
+                    sstatusMessage.visible = true;
+                    sstatusTimer.start();
+
+                    console.log("Cleared map and coordinates.");
+                }
+
             }
         }
 
@@ -1623,7 +1729,7 @@ Window {
             }
         }
 
-        // Send Start Goal
+        // PICK button
         Button {
             text: "PICK"
             width: 180
@@ -1656,14 +1762,13 @@ Window {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     console.log("Selected Shelf: " + shelfDropdown.currentText);
-                    console.log("Selected Location: " + locationDropdown.currentText);
-
                     var shelf = shelfDropdown.currentText;
                     var goal = cameraMapRow.goalCoordinates[shelf];
 
                     if (goal) {
-                        console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
-                        rosConnector.sendGoal(goal.x, goal.y);
+                        var yaw = goal.yaw !== undefined ? goal.yaw : 0;
+                        console.log("Sending goal: x=" + goal.x + " y=" + goal.y + " yaw=" + yaw);
+                        rosConnector.sendGoal(goal.x, goal.y, yaw);
                         statusMessage.text = "ASLR is going to " + shelf + "...";
                         statusMessage.color = "green";
                         statusMessage.visible = true;
@@ -1679,7 +1784,7 @@ Window {
             }
         }
 
-        // Send End Goal
+        // DROP button
         Button {
             text: "DROP"
             width: 180
@@ -1711,15 +1816,14 @@ Window {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    console.log("Selected Shelf: " + shelfDropdown.currentText);
                     console.log("Selected Location: " + locationDropdown.currentText);
-
                     var location = locationDropdown.currentText;
                     var goal = cameraMapRow.goalCoordinates[location];
 
                     if (goal) {
-                        console.log("Sending goal: x=" + goal.x + " y=" + goal.y);
-                        rosConnector.sendGoal(goal.x, goal.y);
+                        var yaw = goal.yaw !== undefined ? goal.yaw : 0;
+                        console.log("Sending goal: x=" + goal.x + " y=" + goal.y + " yaw=" + yaw);
+                        rosConnector.sendGoal(goal.x, goal.y, yaw);
                         statusMessage.text = "Dropping the shelf at " + location + "...";
                         statusMessage.color = "green";
                         statusMessage.visible = true;
@@ -1734,6 +1838,7 @@ Window {
                 }
             }
         }
+
 
         // QR Scan
         Item {
@@ -1906,8 +2011,8 @@ Window {
 
         Row {
             id: cameraMapRow
-            property real mapScalex: 59
-            property real mapScaley: 48
+            property real mapScalex: 100
+            property real mapScaley: 60
             property real mapWidth: digitalTwinMap.width
             property real mapHeight: digitalTwinMap.height
             property var goalCoordinates: ({})
@@ -1988,7 +2093,7 @@ Window {
                     height: 40
                     x: cameraMapRow.robotX - width / 2
                     y: cameraMapRow.robotY - height / 2
-                    //rotation: cameraMapRow.robotRotation
+                    rotation: cameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
@@ -2037,7 +2142,10 @@ Window {
 
                     cameraMapRow.robotX = cameraMapRow.metersToPixelsX(x);
                     cameraMapRow.robotY = cameraMapRow.metersToPixelsY(y);
-                    cameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                    var siny_cosp = 2.0 * (q.w * q.z + q.x * q.y);
+                    var cosy_cosp = 1.0 - 2.0 * (q.y * q.y + q.z * q.z);
+                    cameraMapRow.robotRotation = Math.atan2(siny_cosp, cosy_cosp) * 180 / Math.PI;
+                    //cameraMapRow.robotRotation = (cameraMapRow.robotRotation + 360) % 360;
                 }
 
                 function onGlobalPathReceived(json) {
@@ -3011,8 +3119,8 @@ Window {
         // Digital Twin
         Row {
             id: mcameraMapRow
-            property real mapScalex: 59
-            property real mapScaley: 48
+            property real mapScalex: 100
+            property real mapScaley: 60
             property real mapWidth: mdigitalTwinMap.width
             property real mapHeight: mdigitalTwinMap.height
 
@@ -3088,7 +3196,7 @@ Window {
                     height: 40
                     x: mcameraMapRow.robotX - width / 2
                     y: mcameraMapRow.robotY - height / 2
-                    //rotation: mcameraMapRow.robotRotation
+                    rotation: mcameraMapRow.robotRotation
                     transformOrigin: Item.Center
                     smooth: true
                     antialiasing: true
@@ -3137,7 +3245,11 @@ Window {
 
                     mcameraMapRow.robotX = mcameraMapRow.metersToPixelsX(x);
                     mcameraMapRow.robotY = mcameraMapRow.metersToPixelsY(y);
-                    mcameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                    //mcameraMapRow.robotRotation = Math.atan2(2.0 * (q.w * q.z), 1.0 - 2.0 * (q.z * q.z)) * 180 / Math.PI;
+                    var siny_cosp = 2.0 * (q.w * q.z + q.x * q.y);
+                    var cosy_cosp = 1.0 - 2.0 * (q.y * q.y + q.z * q.z);
+                    mcameraMapRow.robotRotation = Math.atan2(siny_cosp, cosy_cosp) * 180 / Math.PI;
+                    //mcameraMapRow.robotRotation = (cameraMapRow.robotRotation + 360) % 360;
                 }
 
                 function onGlobalPathReceived(json) {
